@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="HWFWM Essences">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{color-scheme:light}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{color-scheme:dark}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -228,7 +228,7 @@ footer{border-top:1px solid var(--line);padding-top:16px}
 footer p{margin:4px 0;max-width:80ch}
 
 /* dialog */
-dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;width:min(560px,calc(100vw - 32px));max-height:min(80vh,720px)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;width:min(560px,calc(100vw - 32px));max-height:min(80vh,600px);overflow:auto}
 dialog::backdrop{background:rgba(10,11,20,.45)}
 .dlg{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px}
 .dlg-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -243,6 +243,7 @@ dialog::backdrop{background:rgba(10,11,20,.45)}
 .dlg textarea{width:100%;min-height:200px;font-family:var(--mono);font-size:13px;border:1px solid var(--line);border-radius:6px;background:var(--sunk);color:var(--ink);padding:8px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;max-width:calc(100vw - 32px);z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.25)}
 </style>
+<style>html:root:root{--bg:#0d0e19;--surface:#161929;--sunk:#11131f;--ink:#e8e9f3;--muted:#9a9fbc;--line:#2a2e46;--accent:#8e91ff;--accent-ink:#0d0e19;--accent-soft:#22254a;--warn:#fb923c;--rC:#a9aebd;--rU:#4cc47e;--rR:#5aa3f2;--rE:#b884f2;--rL:#efb93d;--rQ:#8f96b5;color-scheme:dark}</style>
 </head>
 <body>
 
@@ -1495,8 +1496,14 @@ function openInfo(spec){
 function showDlg(inner){
   $('dlgBody').innerHTML=`<div class="dlg-top"><div style="min-width:0">${inner.split('</h2>')[0]}</h2></div><button type="button" class="btn" data-close style="padding:6px 12px">Close</button></div>${inner.split('</h2>').slice(1).join('</h2>')}`;
   const d=$('dlg');if(d.showModal){try{d.showModal()}catch(e){d.setAttribute('open','')}}else d.setAttribute('open','');
-  d.scrollTop=0;
+  d.scrollTop=0;placeNear(d,true);
 }
+let lastY=null;
+document.addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('dialog'))lastY=e.clientY},true);
+function placeNear(el,isDlg){const vh=window.innerHeight;
+  if(lastY==null||vh<=(screen.availHeight||screen.height||900)+40){el.style.top='';el.style.bottom='';el.style.margin='';el.style.inset='';return}
+  const h=el.offsetHeight||60;let top=isDlg?lastY-40:lastY+28;if(!isDlg&&top+h>vh-8)top=lastY-h-28;
+  top=Math.max(8,Math.min(top,vh-h-8));el.style.inset='auto';el.style.margin=isDlg?'0':'';el.style.left='50%';el.style.transform='translateX(-50%)';el.style.top=top+'px';el.style.bottom='auto'}
 $('dlg').addEventListener('click',e=>{if(e.target.id==='dlg'||e.target.closest('[data-close]'))$('dlg').close()});
 
 /* ---------- copy ---------- */
@@ -1515,7 +1522,7 @@ $('copyBtn').addEventListener('click',()=>{
 });
 
 /* ---------- toast ---------- */
-let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3800)}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;placeNear(t,false);clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3800)}
 
 /* ---------- events ---------- */
 $('rollBtn').addEventListener('click',rollAll);
