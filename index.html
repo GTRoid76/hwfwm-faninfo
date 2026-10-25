@@ -1496,10 +1496,31 @@ function openInfo(spec){
 function showDlg(inner){
   $('dlgBody').innerHTML=`<div class="dlg-top"><div style="min-width:0">${inner.split('</h2>')[0]}</h2></div><button type="button" class="btn" data-close style="padding:6px 12px">Close</button></div>${inner.split('</h2>').slice(1).join('</h2>')}`;
   const d=$('dlg');if(d.showModal){try{d.showModal()}catch(e){d.setAttribute('open','')}}else d.setAttribute('open','');
-  d.scrollTop=0;placeNear(d,true);
+  d.scrollTop=0;placeVisible(d,true);
 }
-let lastY=null;
-document.addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('dialog'))lastY=e.clientY},true);
+let lastY=null,lastEl=null;
+document.addEventListener('pointerdown',e=>{if(!e.target.closest||!e.target.closest('dialog')){lastY=e.clientY;lastEl=e.target}},true);
+document.addEventListener('click',e=>{if(e.target.closest&&!e.target.closest('dialog')&&e.detail===0)lastEl=e.target},true);
+function visibleRect(){return new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v)}};
+  let s=document.getElementById('visSentinel');if(!s){s=document.createElement('div');s.id='visSentinel';s.style.cssText='position:absolute;left:0;top:0;width:1px;pointer-events:none;visibility:hidden';document.documentElement.appendChild(s)}
+  s.style.height=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight)+'px';
+  const full={top:0,bottom:window.innerHeight};
+  if(typeof IntersectionObserver==='undefined'){fin(full);return}
+  const io=new IntersectionObserver(es=>{io.disconnect();const r=es[0].intersectionRect;fin(r&&r.height>40?{top:r.top,bottom:r.bottom}:full)});io.observe(s);setTimeout(()=>{io.disconnect();fin(full)},400)})}
+function placeVisible(el,isDlg){el.style.visibility='hidden';
+  visibleRect().then(v=>{const avail=v.bottom-v.top;
+    if(isDlg)el.style.maxHeight=Math.max(200,Math.min(600,avail-24))+'px';
+    const h=el.offsetHeight||60;let top=isDlg?v.top+Math.max(12,(avail-h)/2):v.bottom-h-16;
+    el.style.position='fixed';el.style.inset='auto';el.style.margin='0';el.style.left='50%';el.style.transform='translateX(-50%)';el.style.top=Math.max(v.top+8,top)+'px';el.style.bottom='auto';el.style.visibility=''})}
+function placeDlg(d){
+  const de=document.documentElement,docH=Math.max(de.scrollHeight,document.body.scrollHeight);
+  const anchor=lastEl&&lastEl.isConnected?lastEl:null;
+  let y=anchor?anchor.getBoundingClientRect().top+window.scrollY:(lastY!=null?lastY+window.scrollY:window.scrollY+80);
+  d.style.position='absolute';d.style.inset='auto';d.style.margin='0';d.style.left='50%';d.style.transform='translateX(-50%)';
+  const h=d.offsetHeight||300;let top=y-24;
+  top=Math.max(8,Math.min(top,docH-h-8));d.style.top=top+'px';
+  requestAnimationFrame(()=>{try{d.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){d.scrollIntoView(false)}});
+}
 function placeNear(el,isDlg){const vh=window.innerHeight;
   if(lastY==null||vh<=(screen.availHeight||screen.height||900)+40){el.style.top='';el.style.bottom='';el.style.margin='';el.style.inset='';return}
   const h=el.offsetHeight||60;let top=isDlg?lastY-40:lastY+28;if(!isDlg&&top+h>vh-8)top=lastY-h-28;
@@ -1522,7 +1543,7 @@ $('copyBtn').addEventListener('click',()=>{
 });
 
 /* ---------- toast ---------- */
-let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;placeNear(t,false);clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3800)}
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;placeVisible(t,false);clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3800)}
 
 /* ---------- events ---------- */
 $('rollBtn').addEventListener('click',rollAll);
