@@ -1,0 +1,1879 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HWFWM Essences</title>
+<meta name="description" content="Roll random He Who Fights With Monsters builds, plan your own, and look up essences, confluences, combos, stones and more.">
+<meta name="theme-color" content="#0d0e19">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HWFWM Essences">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{color-scheme:light}body{margin:0;font-size:14px;font-family:system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky action bar, then a 4-slot build grid (Power/Speed/Spirit/Recovery), close-combo list, collapsible settings. */
+:root{
+  --bg:#eceef4; --surface:#ffffff; --sunk:#f4f5f9; --ink:#171a2b; --muted:#5a5f78; --line:#d5d8e4;
+  --accent:#3b3ec2; --accent-ink:#ffffff; --accent-soft:#e6e7fb; --warn:#b4410f;
+  --rC:#8a8f9f; --rU:#2b9454; --rR:#2a76cf; --rE:#9147cf; --rL:#c48a12; --rQ:#6b7290;
+  --display:"Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d0e19; --surface:#161929; --sunk:#11131f; --ink:#e8e9f3; --muted:#9a9fbc; --line:#2a2e46;
+  --accent:#8e91ff; --accent-ink:#0d0e19; --accent-soft:#22254a; --warn:#fb923c;
+  --rC:#a9aebd; --rU:#4cc47e; --rR:#5aa3f2; --rE:#b884f2; --rL:#efb93d; --rQ:#8f96b5; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0d0e19; --surface:#161929; --sunk:#11131f; --ink:#e8e9f3; --muted:#9a9fbc; --line:#2a2e46;
+  --accent:#8e91ff; --accent-ink:#0d0e19; --accent-soft:#22254a; --warn:#fb923c;
+  --rC:#a9aebd; --rU:#4cc47e; --rR:#5aa3f2; --rE:#b884f2; --rL:#efb93d; --rQ:#8f96b5; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.r-C{--rx:var(--rC)}.r-U{--rx:var(--rU)}.r-R{--rx:var(--rR)}.r-E{--rx:var(--rE)}.r-L{--rx:var(--rL)}.r-Q{--rx:var(--rQ)}
+
+/* header + bar */
+.masthead{padding-block:22px 6px;display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;justify-content:space-between}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,4vw,32px);letter-spacing:.01em;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.bar{padding-block:2px 14px;display:flex;flex-wrap:wrap;gap:8px}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-bottom:14px}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-block:6px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:0;background:none;padding:8px 12px;border-radius:7px;font-family:var(--display);font-weight:600;font-size:15px;color:var(--muted)}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+.listhead h2{font-family:var(--display);font-weight:700;font-size:24px;margin:4px 0 2px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-block:12px 6px}
+#q{flex:1 1 220px;font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0}
+.fchips{display:flex;flex-wrap:wrap;gap:6px}
+.fchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+.fchip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.rows{display:grid;gap:6px;margin-top:8px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-width:0}
+.row>summary,.row.plain{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:10px 12px;list-style:none}
+.row>summary{cursor:pointer}
+.row>summary::-webkit-details-marker{display:none}
+.row>summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:-3px 2px 0 4px;transition:transform .15s}
+.row[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.row>summary:hover .rn{color:var(--accent)}
+.row .rn{font-family:var(--display);font-weight:700;font-size:17px}
+.row .rt{margin-left:auto;color:var(--muted);font-size:13px}
+.row .sub2{flex-basis:100%;order:10;color:var(--muted);font-size:13px}
+.row>summary::after{order:5}
+.row .body{padding:0 12px 12px;display:grid;gap:8px;font-size:14px}
+.row .body p{margin:0;max-width:75ch}
+.row .body .btn{justify-self:start;padding:6px 12px;font-size:13.5px}
+.badge{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);border-radius:4px;padding:0 5px}
+.abil{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.abil b{font-family:var(--display)}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+a.btn{color:var(--ink);text-decoration:none}
+.btn svg{width:17px;height:17px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-family:var(--display);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:15px;padding:9px 20px}
+.btn.primary:hover{filter:brightness(1.08)}
+.race{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin-bottom:12px;color:var(--muted)}
+.race b{font-family:var(--display);color:var(--ink);font-size:17px}
+
+/* build grid */
+.build{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.conf{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.card.pop{animation:pop .35s ease-out}
+@keyframes pop{from{transform:translateY(4px);opacity:.55}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.card.pop{animation:none}}
+.attr{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tools{display:flex;gap:4px}
+.icon{border:1px solid transparent;background:none;border-radius:6px;padding:5px;display:inline-flex;color:var(--muted)}
+.icon svg{width:17px;height:17px}
+.icon:hover{color:var(--ink);border-color:var(--line)}
+.icon[aria-pressed="true"]{color:var(--accent);border-color:var(--accent);background:var(--surface)}
+.icon:disabled{opacity:.35;cursor:not-allowed}
+.head{display:flex;gap:12px;align-items:center;min-width:0}
+.cube{flex:none;width:48px;height:48px;border-radius:6px;border:2px solid var(--rx);background:linear-gradient(135deg,color-mix(in srgb,var(--rx) 38%,var(--surface)) 0%,var(--surface) 70%);box-shadow:inset -5px -5px 0 color-mix(in srgb,var(--rx) 18%,transparent);font-family:var(--display);font-weight:700;font-size:21px;color:var(--rx);display:grid;place-items:center;padding:0}
+.cube.unknown{border-style:dashed;background:var(--surface);box-shadow:none;color:var(--muted)}
+.name{background:none;border:0;padding:0;font-family:var(--display);font-weight:700;font-size:22px;line-height:1.15;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}
+.name:hover{text-decoration-color:var(--line)}
+.meta{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;margin-top:3px;font-size:12.5px;color:var(--muted)}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--rx);border:1px solid color-mix(in srgb,var(--rx) 55%,transparent);border-radius:4px;padding:0 5px}
+.flag{color:var(--warn);font-weight:600}
+.from{font-size:13px;color:var(--muted)}
+.cnote{font-size:13.5px;margin:0}
+.desc{display:block;width:100%;text-align:left;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13.5px;line-height:1.45}
+.desc:hover{border-color:var(--accent)}
+.desc .txt{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.desc .more{display:block;margin-top:4px;font-size:12.5px;font-weight:600;color:var(--accent)}
+.desc.none{color:var(--muted);font-style:italic}
+.stones-h{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 -4px}
+.stones{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.stone{flex:1;min-width:0;display:flex;align-items:center;gap:9px;background:none;border:0;border-radius:6px;padding:5px 6px;text-align:left}
+.srow{display:flex;align-items:center;gap:2px}
+.srow .icon{padding:4px}
+.srow .icon svg{width:15px;height:15px}
+.srow.locked .stone{background:var(--sunk)}
+.stone:hover{background:var(--sunk)}
+.marble{flex:none;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--rx) 25%,#fff) 0%,var(--rx) 55%,color-mix(in srgb,var(--rx) 60%,#000) 100%)}
+.stone .sn{font-weight:500}
+.stone .tag{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:0 5px}
+.stone.unconf .sn{color:var(--muted)}
+.stone-tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:0 5px}
+.legend{font-size:13px;color:var(--muted);margin:10px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.legend .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--line);border-radius:4px;padding:0 5px}
+
+/* near combos */
+.section{margin-top:22px}
+.section h2{font-family:var(--display);font-weight:600;font-size:19px;margin:0 0 4px}
+.section .lead{color:var(--muted);margin:0 0 10px;font-size:14px;max-width:65ch}
+.near{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px}
+.swap{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 11px;text-align:left}
+.swap:hover{border-color:var(--accent)}
+.swap .arrow{color:var(--muted)}
+.swap .to{font-family:var(--display);font-weight:600}
+.swap .cf{margin-left:auto;font-family:var(--display);font-weight:700;color:var(--accent)}
+.swap .off{flex-basis:100%;font-size:12px;color:var(--muted)}
+.empty{color:var(--muted);font-size:14px}
+
+/* history */
+.hist{display:flex;flex-wrap:wrap;gap:6px}
+.hist button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px}
+.hist button:hover{border-color:var(--accent)}
+
+/* settings */
+details.settings{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+details.settings>summary{cursor:pointer;padding:14px 16px;font-family:var(--display);font-weight:600;font-size:19px;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center}
+details.settings>summary::-webkit-details-marker{display:none}
+details.settings>summary .count{font-family:var(--body);font-weight:400;font-size:13px;color:var(--muted)}
+.setgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;padding:4px 16px 18px}
+.grp h3{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:500}
+.grp .hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;padding:4px 9px;font-size:13.5px;cursor:pointer;background:var(--surface)}
+.checks input{accent-color:var(--accent)}
+.catrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-block:4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:4px 10px;font-size:13px;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.toggle{display:flex;gap:10px;align-items:flex-start;padding-block:5px;cursor:pointer}
+.toggle input{margin-top:4px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.toggle small{display:block;color:var(--muted);font-size:12.5px}
+.addrow{display:flex;flex-wrap:wrap;gap:6px}
+.addrow input,.addrow select{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);min-width:0}
+.addrow input{flex:1 1 120px}
+.customs{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.customs li{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:3px 4px 3px 9px;font-size:13.5px}
+.customs button{border:0;background:none;color:var(--muted);padding:0 4px;font-size:16px;line-height:1}
+.changes{font-size:13px;color:var(--muted);margin:0;padding:0 16px 16px;max-width:80ch}
+
+footer{margin-top:28px;font-size:13px;color:var(--muted)}
+.credits-h{font-family:var(--display);font-weight:600;font-size:19px;color:var(--ink);margin:0 0 6px}
+.credits{margin:0 0 10px;padding-left:18px;display:grid;gap:4px;max-width:80ch;font-size:14px}
+.credits b{color:var(--ink)}
+footer{border-top:1px solid var(--line);padding-top:16px}
+.btools{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:10px}
+.bbtns{display:flex;flex-wrap:wrap;gap:6px}
+.bbtns.share{margin-top:10px}
+.btn.sm{padding:6px 11px;font-size:13.5px}
+.btn.primary.sm{font-size:13px;padding:7px 14px}
+.fl{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--muted);min-width:0}
+.fl input,.fl select,.fl textarea{font:inherit;font-size:14.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:7px 9px;min-width:0;width:100%}
+.fl textarea{resize:vertical;min-height:52px}
+.row2{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.bslots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin-top:10px}
+.bslot,.bsec{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.bsec{margin-top:12px}
+.bsec h3{font-family:var(--display);font-weight:600;font-size:17px;margin:0}
+.bslot.conf{background:var(--accent-soft)}
+.bs-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.cnt{font-family:var(--mono);font-size:11.5px;color:var(--accent)}
+.abl{display:grid;gap:6px}
+.abil-d{border:1px solid var(--line);border-radius:8px;background:var(--bg);min-width:0}
+.abil-d>summary{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:8px 10px;cursor:pointer;list-style:none;font-size:14px}
+.abil-d>summary::-webkit-details-marker{display:none}
+.abil-d[open]>summary{border-bottom:1px solid var(--line)}
+.abn{font-family:var(--display);font-weight:600}
+.stat{margin-left:auto;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;border-radius:4px;padding:0 5px;border:1px solid var(--line);color:var(--muted)}
+.stat.aw{color:var(--rU);border-color:color-mix(in srgb,var(--rU) 50%,transparent)}
+.abody{padding:10px;display:grid;gap:8px}
+.more>summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600}
+.more[open]{display:grid;gap:8px}
+.sugg{font-size:13.5px;margin:0;color:var(--muted)}
+.sugg b{color:var(--ink)}
+.linkb{background:none;border:0;padding:0;color:var(--accent);font-weight:600;text-decoration:underline}
+.warnline{color:var(--warn);font-size:13.5px;margin:6px 0 0}
+.gift{display:grid;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+[hidden]{display:none!important}
+.loadta{font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:9px;width:100%;min-height:110px;resize:vertical}
+.filebtn{justify-self:start;cursor:pointer;position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.rcodes{display:grid;gap:6px}
+.rcodes h4{margin:4px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.rcode{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13.5px}
+.rcode:hover{border-color:var(--accent)}
+.rcode .rk{margin-left:auto;font-size:12px;color:var(--muted)}
+.loadp{margin-top:10px;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:12px;display:grid;gap:8px}
+
+footer p{margin:4px 0;max-width:80ch}
+
+/* dialog */
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;width:min(560px,calc(100vw - 32px));max-height:min(80vh,720px)}
+dialog::backdrop{background:rgba(10,11,20,.45)}
+.dlg{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px}
+.dlg-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.dlg h2{font-family:var(--display);font-weight:700;font-size:24px;margin:0}
+.dlg .kind{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.dlg p{margin:0;max-width:65ch}
+.dlg h3{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 0 2px;font-weight:500}
+.clist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.clist li{font-size:14px;border-top:1px solid var(--line);padding-top:6px}
+.clist b{font-family:var(--display)}
+.clist small{display:block;color:var(--muted)}
+.dlg textarea{width:100%;min-height:200px;font-family:var(--mono);font-size:13px;border:1px solid var(--line);border-radius:6px;background:var(--sunk);color:var(--ink);padding:8px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:14px;max-width:calc(100vw - 32px);z-index:20;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <h1>HWFWM Essences</h1>
+    <p class="sub">Roll random He Who Fights With Monsters builds, and look up essences, confluences, combos, stones and more.</p>
+  </header>
+
+  <nav class="nav" aria-label="Sections"><div class="tabs" id="tabs" role="tablist"></div></nav>
+
+  <div id="view-list" hidden>
+    <div class="listhead"><h2 id="listTitle"></h2><p class="lead sub" id="listLead"></p></div>
+    <div class="filters"><input type="search" id="q" placeholder="Search" aria-label="Search this list"><div class="fchips" id="listChips"></div></div>
+    <p class="from" id="listCount"></p>
+    <div class="rows" id="rows"></div>
+  </div>
+
+  <div id="view-build" hidden>
+<div class="listhead"><h2>Build Maker</h2><p class="lead sub">Plan a character by hand: essences, confluence, stones, abilities and racial gifts. Leave anything blank you haven't decided yet.</p></div>
+<p class="warnline" id="saveNote" hidden>This page can't save builds in this browser. Use "Copy build code" to keep your work.</p>
+<div class="btools"><label class="fl" style="flex:1 1 220px">Your builds<select id="bSel"></select></label>
+<div class="bbtns"><button class="btn sm" id="bNew" type="button">New</button><button class="btn sm" id="bDup" type="button">Duplicate</button><button class="btn sm" id="bDel" type="button">Delete</button></div></div>
+<div class="bbtns share"><button class="btn primary sm" id="bDiscord" type="button">Copy for Discord</button><button class="btn sm" id="bCode" type="button">Copy build code</button><button class="btn sm" id="bLoad" type="button">Load build code</button><button class="btn sm" id="bDown" type="button">Download</button></div>
+<div class="loadp" id="downPanel" hidden>
+<p class="from" style="margin:0">Save this build as a file. It includes the build code, so you can reopen it here later with Open a build file.</p>
+<div class="bbtns"><button class="btn sm" data-dl="docx" type="button">Word (.docx)</button><button class="btn sm" data-dl="odt" type="button">OpenDocument (.odt)</button><button class="btn sm" data-dl="txt" type="button">Text (.txt)</button><button class="btn sm" id="downClose" type="button">Close</button></div>
+</div>
+<div class="loadp" id="loadPanel" hidden>
+<label class="fl" for="loadTa">Paste a build code: long-press inside the box and choose Paste</label>
+<textarea id="loadTa" class="loadta" rows="5" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Long-press here to paste. The code starts with HWFWM."></textarea>
+<div class="bbtns"><button class="btn primary sm" id="loadGo" type="button">Load build</button><button class="btn sm" id="loadCancel" type="button">Close</button></div>
+<p class="from" style="margin:0">It loads as a new build, so nothing you have is overwritten. Extra text around the code is fine.</p>
+<label class="btn sm filebtn">Open a build file<input type="file" id="loadFile" accept=".docx,.odt,.txt,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text"></label>
+<div id="recentCodes"></div>
+</div>
+<p class="from" style="margin:8px 0 0">Builds save in this browser only. To keep one safe or share it, copy its build code.</p>
+<div id="bMain"></div>
+<datalist id="dl-ess"></datalist><datalist id="dl-conf"></datalist><datalist id="dl-stone"></datalist><datalist id="dl-race"></datalist>
+</div>
+<div id="view-roll">
+  <div class="bar" role="toolbar" aria-label="Build actions">
+    <button class="btn primary" id="rollBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.3" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.3" fill="currentColor"/></svg>
+      Roll build</button>
+    <button class="btn" id="stonesBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M9 9.5a3.5 3.5 0 0 1 4-1"/></svg>
+      New stones</button>
+    <button class="btn" id="copyBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      Copy build</button>
+    <button class="btn" id="planBtn" type="button">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
+Plan this build</button>
+<button class="btn" id="setBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+      Settings</button>
+  </div>
+
+  <div class="race" id="raceLine" hidden></div>
+  <main class="build" id="build" aria-live="polite"></main>
+  <p class="legend"><span class="tag">Unconfirmed</span> Not seen in the books or confirmed by Shirtaloon yet. It's included because most essences and confluences have a matching stone. Turn on "Confirmed stones only" in Roll settings to skip these.</p>
+
+  <section class="section" id="nearSec">
+    <h2 id="nearTitle">Close known combos</h2>
+    <p class="lead" id="nearLead"></p>
+    <div class="near" id="near"></div>
+  </section>
+
+  <details class="settings" id="settings">
+    <summary>Roll settings <span class="count" id="poolCount"></span></summary>
+    <div class="setgrid">
+      <div class="grp">
+        <h3>Essence rarities</h3>
+        <div class="checks" id="essR"></div>
+        <h3 style="margin-top:16px">Essence categories</h3>
+        <div id="cats"></div>
+        <p class="hint"><b>Never</b> skips that category. <b>Require</b> means at least one of your three essences must come from it.</p>
+      </div>
+      <div class="grp">
+        <h3>Options</h3>
+        <label class="toggle"><input type="checkbox" id="optConfirmed"><span>Only roll confirmed confluences<small>Picks from the known combo list, so you never get an Unknown Confluence.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="optRestricted"><span>Allow restricted essences and combos<small>Death, Corrupt, Undeath, Cyborg and the rest of the Adventure Society's list.</small></span></label>
+                <label class="toggle"><input type="checkbox" id="optRace"><span>Roll a race too</span></label>
+      </div>
+      <div class="grp">
+        <h3>Awakening stone rarities</h3>
+        <div class="checks" id="stoneR"></div>
+        <label class="toggle" style="margin-top:8px"><input type="checkbox" id="optStoneConfirmed"><span>Confirmed stones only<small>Only stones named in the books or by Shirtaloon. Off also allows a stone for every essence and confluence.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="optJokes"><span>Include joke stones<small>Mediocrity and Puberty.</small></span></label>
+        <h3 style="margin-top:16px">Stone categories</h3>
+        <div id="scats"></div>
+        <p class="hint">A stone counts as the category of the essence it matches. Stones that match a confluence count as Confluence, and stones with no match count as Other. <b>Require</b> means at least one of your 16 stones must come from it.</p>
+      </div>
+      <div class="grp">
+        <h3>Your own essences</h3>
+        <p class="hint" style="margin:0 0 8px">Add animals, tools or anything else that exists but isn't in a confirmed combo yet. They roll like any other essence and get a matching stone.</p>
+        <form class="addrow" id="addForm" autocomplete="off">
+          <input id="addName" placeholder="Name, e.g. Owl" maxlength="24" aria-label="Essence name">
+          <select id="addRarity" aria-label="Rarity"></select>
+          <select id="addCat" aria-label="Category"></select>
+          <button class="btn" type="submit">Add</button>
+        </form>
+        <ul class="customs" id="customs"></ul>
+        <button class="btn" id="resetBtn" type="button" style="margin-top:16px">Reset settings</button>
+      </div>
+    </div>
+    <p class="changes">Differences from the original sheet's categories: Glass counts as Elemental (the Info sheet calls it an elemental sub-type), Tree is no longer an Animal, and Hammer and Knife count as both Weapon and Tool. Essences with no category are grouped as Other.</p>
+  </details>
+
+  <section class="section" id="histSec">
+    <h2>Recent rolls</h2>
+    <div class="hist" id="hist"></div>
+  </section>
+
+  </div>
+
+  <section class="section" id="offlineSec">
+    <h2>Use it offline</h2>
+    <p class="lead"><b>Phone:</b> open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>. On iPhone, tap <b>Share</b>, then <b>Add to Home Screen</b>. It gets its own icon and works without signal.</p>
+    <p class="lead"><b>PC:</b> click the install icon at the right end of the address bar, or save the page as a file and open it in any browser.</p>
+    <p><a class="btn" href="index.html" download="HWFWM-Essences.html">Download the page file</a></p>
+  </section>
+
+  <footer>
+<h2 class="credits-h">Credits</h2>
+<ul class="credits">
+<li><b>LlamaWaffles555</b>, for the HWFWM Info sheet, where almost everything here comes from, and for the original Essence Randomizer (v1.0.5) this is built on.</li>
+<li><b>Karaaga</b>, for the HWFWM Character Stats sheet, a source for the Info sheet.</li>
+<li><b>Shirtaloon</b> (Travis Deverell), author of He Who Fights With Monsters, for the series and for answering so many questions on Discord.</li>
+<li>The <b>HWFWM Discord</b> and <b>HWFWM Wiki</b> communities, for gathering and checking this information.</li>
+</ul>
+<p>Unofficial fan tool. Stones marked <i>unconfirmed</i> follow the rule that most essences and confluences have a matching awakening stone, but haven't been seen yet. Tap any essence, confluence or stone for its notes.</p>
+</footer>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlgTitle"><div class="dlg" id="dlgBody"></div></dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+// ===== DATA (from HWFWM Info by LlamaWaffles555) =====
+// Essences: name|rarity|categories   rarity: C U R E L ?   cats: A animal W weapon T tool E elemental M modifier B body
+const ESS_RAW = `Adept|C|M
+Ape|C|A
+Armour|C|W
+Axe|C|W
+Balance|U|M
+Bat|C|A
+Bear|C|A
+Bee|C|A
+Bird|C|A
+Blight|?|
+Blood|U|B
+Bone|U|B
+Bow|C|W
+Brush|?|T
+Cage|C|T
+Cat|C|A
+Cattle|C|A
+Chain|C|T
+Claw|U|W
+Cloth|C|T
+Cloud|U|E
+Cold|U|E
+Coral|C|A
+Corrupt|E|
+Crocodile|C|A
+Crystal|R|
+Dance|U|
+Dark|U|E
+Death|U|
+Deep|R|M
+Deer|C|A
+Dimension|L|
+Discord|E|
+Dog|C|A
+Duck|C|A
+Dust|U|E
+Earth|C|E
+Echo|R|M
+Elemental|E|E
+Eye|C|B
+Feast|C|
+Feeble|?|
+Fire|C|E
+Fish|C|A
+Flea|C|A
+Flesh|U|B
+Foot|C|B
+Fork|C|T
+Fox|C|A
+Frog|C|A
+Fungus|C|
+Gathering|R|M
+Glass|U|E
+Goat|C|A
+Grazen|C|A
+Growth|U|M
+Gun|C|W
+Hair|C|B
+Hammer|C|WT
+Hand|C|B
+Harmonic|E|M
+Heidel|C|A
+Hook|C|T
+Horse|C|A
+Hunger|R|
+Hunt|C|
+Ice|U|E
+Iron|C|E
+Knife|C|WT
+Knowledge|U|
+Life|U|
+Light|U|E
+Lightning|U|E
+Lizard|C|A
+Locust|C|A
+Lurker|?|
+Magic|C|M
+Malign|E|
+Manatee|C|A
+Might|C|M
+Mirror|U|
+Monkey|C|A
+Moon|R|
+Mouse|C|A
+Myriad|L|M
+Needle|C|T
+Net|C|T
+Octopus|C|A
+Omen|E|
+Pangolin|C|A
+Paper|C|T
+Plant|C|
+Potent|E|M
+Pure|U|
+Rabbit|C|A
+Rake|C|T
+Rat|C|A
+Renewal|E|
+Resolute|R|
+Rune|E|
+Sand|U|E
+Sceptre|C|T
+Serene|R|
+Shark|C|A
+Shield|C|W
+Shimmer|E|
+Ship|C|
+Shovel|C|T
+Sickle|C|W
+Sin|L|
+Skunk|C|A
+Sloth|C|A
+Smoke|U|
+Snake|C|A
+Song|U|
+Spear|C|W
+Spider|C|A
+Spike|C|T
+Staff|C|W
+Star|R|
+Sun|R|
+Swift|C|M
+Sword|C|W
+Technology|C|
+Tentacle|E|B
+Thread|C|T
+Trap|C|
+Tree|C|
+Trowel|C|T
+Turtle|C|A
+Vast|L|M
+Vehicle|C|
+Venom|U|E
+Visage|L|
+Void|L|
+Wasp|C|A
+Water|C|E
+Whale|C|A
+Wheel|C|T
+Whip|C|W
+Wind|C|E
+Wing|E|B
+Wolf|C|A
+Wood|?|E
+Zeal|R|M`;
+
+const CONFLUENCES = `Action Alchemy Ambush Animate Anzu Arsenal Avatar Battlefield Behemoth Boundary Bounty Cataclysm Chaotic Charlatan Chimera Cyborg Cycle Dawn Desolate Discordant Doom Doppelganger Dragon Eclipse Edifice Effigy Empower Fertile Fey Firebird Force Forge Fortress Garuda Gate Glimeron Gorgon Griffin Guardian Harpy Harvest Hydra Immortal Juggernaut Karmic Kraken Leviathan Lotus Magitech Manticore Master Ministration Minotaur Mirage Monolith Mystic Nebula Nemesis Network Oasis Ocean Onslaught Phantasmagoria Phoenix Predatory Prison Prosperity Refracting Resonating Roc Sacrifice Scribe Serpent Simulacrum Skirmish Sky Soaring Sovereign Stellar Storm Succubus Swarm Talisman Thunderbird Time Tranquil Transfiguration Transgression Troll Twilight Undeath Unity Verdant Vessel Vision Volcano Vortex Weave Wendigo Wrath Ziz`.split(' ');
+
+// Combos: essence essence essence>Confluence|note
+const COMBO_RAW = `Gun Hand Vehicle>Action|
+Adept Venom Water>Alchemy|
+Earth Spike Trap>Ambush|Classic traps that have less impressive effects but are much harder to detect than normal.
+Fire Spider Trap>Ambush|Dawn's combo.
+Iron Thread Trap>Ambush|Razor wire traps.
+Rune Spider Trap>Ambush|Using webs to create rune-enhanced magic traps.
+Bone Death Magic>Animate|Necromancer.
+Cloth Dance Magic>Animate|
+Dance Dust Echo>Animate|Could produce a pseudo-necromancy power set that makes dust clones that mimic the dead, but aren't actually animated dead people.
+Dance Knowledge Mirror>Animate|
+Fungus Growth Zeal>Animate|Fungal mind-control druid.
+Bird Cat Vast>Anzu|
+Myriad Shield Sword>Arsenal|Could produce conjured swords and shields that fight on their own.
+Blood Bone Flesh>Avatar|Powerful shapeshifting, good for spying. Yumi Asano's combo.
+Blood Life Sun>Avatar|
+Corrupt Dimension Magic>Avatar|
+Corrupt Dimension Might>Avatar|
+Corrupt Dimension Potent>Avatar|Warlock.
+Corrupt Magic Void>Avatar|
+Dark Tentacle Void>Avatar|
+Dimension Light Wing>Avatar|Messenger-related power set.
+Dimension Light Zeal>Avatar|
+Dimension Might Renewal>Avatar|More likely than most to produce a lot of summons, with Might buffing allies more than self.
+Dimension Tentacle Void>Avatar|
+Elemental Harmonic Potent>Avatar|
+Elemental Might Resolute>Avatar|Not exactly Superman, but with twenty powers you can get something similar. You'd need the right awakening stones for flight and speed powers.
+Eye Fire Magic>Avatar|Strange power set that frequently summons bizarre orb creatures.
+Hammer Lightning Might>Avatar|
+Lightning Might Sword>Avatar|Magic swordsman. The current Storm King uses this; big on strong, moderate-term buffs.
+Magic Might Potent>Avatar|
+Potent Vast Water>Avatar|Favoured by followers of sea and ocean gods across the cosmos.
+Rune Spear Tree>Avatar|
+Iron Spike Vast>Battlefield|Zone manipulation confluence. Rare because it uses expensive essences that appear in more popular combos.
+Cattle Earth Vast>Behemoth|
+Balance Earth Shield>Boundary|Great for handling incorporeal, astral and summoned entities.
+Dance Feast Knife>Bounty|Erika Asano's combo.
+Death Myriad Void>Cataclysm|For something apocalyptic.
+Dimension Myriad Sin>Cataclysm|More about mass summoning; a carry combo that doesn't show its true colours until higher rank.
+Fire Potent Water>Cataclysm|
+Hunger Vast Void>Cataclysm|
+Balance Magic Potent>Chaotic|Wild Mage.
+Adept Magic Trap>Charlatan|Belinda Callahan's combo.
+Cat Tentacle Void>Chimera|
+Earth Pangolin Shark>Chimera|Armour-plated burrowing sharks!
+Lizard Spider Wolf>Chimera|
+Rat Skunk Snake>Chimera|
+Snake Spider Venom>Chimera|
+Death Flesh Iron>Cyborg|Zombie cyborgs. Doubly restricted, yet not considered the most dangerous Cyborg combo.
+Death Iron Life>Cyborg|Frankenstein's monster / flesh golem style Cyborg.
+Flesh Iron Myriad>Cyborg|Considered the most dangerous Cyborg combo: self-replicating body-control cybernetics that hijack people.
+Flesh Technology Myriad>Cyborg|
+Flesh Iron Technology>Cyborg|The quintessential classic Cyborg.
+Flesh Magic Water>Cyborg|A very different Cyborg, based on alchemy.
+Flesh Might Technology>Cyborg|A booster Cyborg: very powerful buffs with long cooldowns and often backlash effects.
+Balance Light Renewal>Cycle|Dawn-themed: things originating and refreshing. Likely buffs and renewal, some healing, with cleansing and mana replenishing the stronger focus.
+Corrupt Pure Renewal>Cycle|Behavioural transgression, extremely complex.
+Moon Renewal Sun>Cycle|
+Dark Light Sun>Dawn|
+Fire Omen Sun>Dawn|
+Renewal Sun Water>Dawn|
+Blood Hunger Locust>Desolate|A plague of locusts that likes steak over salad. Restricted despite no restricted essences: gold-rank locusts with a thirst for blood can go very wrong near a village.
+Bone Dust Sun>Desolate|Attack/debuff power set based around desiccation attacks.
+Cold Hammer Sickle>Desolate|
+Death Hunger Plant>Desolate|Can turn fertile land into barren earth, draining its vitality.
+Earth Ice Wind>Desolate|Tundra-themed: wide area cold and mana burn, possibly wolf and fox summons.
+Hunger Locust Plant>Desolate|Classic plague of locusts. Not restricted, but looked on unfavourably by local communities.
+Sand Sun Wind>Desolate|Desert combination. Mana drain, stamina drain, withering, giant sand worms, sand storms.
+Bow Corrupt Song>Discordant|Ranged area debuff. Restricted (Corrupt) despite being unlikely to produce anything too nasty.
+Balance Omen Sin>Doom|
+Blight Smoke Venom>Doom|Wide area affliction specialist, centred on affliction amplification with early resistance reduction and immunity bypass.
+Blood Corrupt Flesh>Doom|Often produces vampire powers. Usually an affliction combo.
+Blood Corrupt Potent>Doom|
+Blood Dark Omen>Doom|
+Blood Dark Sin>Doom|Jason Asano's combo.
+Corrupt Feast Growth>Doom|Corruption and consumption for growth. Could pull out an apocalypse beast familiar like Colin.
+Dark Hunger Void>Doom|
+Death Dimension Zeal>Doom|For more localised annihilation.
+Death Potent Void>Doom|
+Death Potent Vast>Doom|For something apocalyptic.
+Growth Hunger Void>Doom|Highly offensive: afflictions, control and raw attack over a moderate area.
+Moon Omen Sun>Doom|
+Flesh Magic Mirror>Doppelganger|A more traditional Doppelganger combo.
+Hunger Magic Mirror>Doppelganger|Magic thief: built around replicating abilities rather than identities.
+Magic Might Wing>Dragon|Humphrey Geller's combo.
+Magic Potent Wing>Dragon|More of a magic focus.
+Balance Dark Light>Eclipse|
+Balance Death Life>Eclipse|
+Balance Moon Sun>Eclipse|Rufus Remore's combo.
+Balance Omen Zeal>Eclipse|
+Dimension Moon Sun>Eclipse|
+Earth Trowel Vast>Edifice|Construction combination for large-scale projects working with stone.
+Blood Dark Shimmer>Effigy|
+Dance Glass Visage>Effigy|Glass clones that mimic others but are frail and explode into shard bombs when attacked.
+Rune Star Tree>Effigy|
+Balance Blood Rune>Empower|
+Balance Hunger Magic>Empower|Classic control set for attrition teams: drains mana and buffs from enemies and gives them to allies. Weak at low ranks, valuable at high ranks.
+Blood Hunger Growth>Empower|Drain-to-buff, more about self buffs than helping allies.
+Blood Hunger Might>Empower|Absorbs elemental forces to gain temporary powers. Expensive.
+Cat Magic Sun>Empower|
+Crystal Magic Sword>Empower|Absorbing various forces and transforming them into attacks.
+Elemental Hunger Potent>Empower|
+Elemental Lightning Sword>Empower|Strong but crude lightning powers, with more sophisticated uses of the other elements.
+Flesh Growth Potent>Empower|
+Frog Hunger Void>Empower|
+Lightning Swift Sword>Empower|Super fast, super strong attacks that combine physical and magical damage.
+Magic Might Swift>Empower|
+Might Renewal Sin>Empower|Stores lust energy to use for buffs.
+Cat Fungus Renewal>Fertile|
+Magic Pure Visage>Fey|Cassandra Mercer's combo.
+Bird Fire Wind>Firebird|
+Adept Magic Might>Force|Warrior mystic, combining powerful physical and telekinetic attacks.
+Balance Might Potent>Force|
+Magic Potent Shield>Force|
+Bird Fire Iron>Forge|Probably a construct-creature heavy power set.
+Fire Hammer Iron>Forge|Gareth (Gary) Xandier's combo.
+Fire Iron Technology>Forge|Balanced artifice/magitech combination.
+Fire Iron Water>Forge|
+Iron Lightning Technology>Forge|
+Earth Iron Shield>Fortress|
+Bird Might Swift>Garuda|The cheaper Garuda combination.
+Might Swift Wing>Garuda|The expensive Garuda combination. Taika Williams' combo.
+Dimension Magic Rune>Gate|Landemere Vane's combo.
+Dimension Magic Void>Gate|
+Dimension Myriad Rune>Gate|
+Fire Mirror Venom>Glimeron|
+Earth Hair Snake>Gorgon|
+Bird Cat Might>Griffin|
+Knowledge Manatee Sand>Guardian|Coastal druid: land and sea, protecting and finding prosperity and balance in nature.
+Magic Shield Void>Guardian|Classic back-line support, shielding party members from the rear. Better for a spell-focused elf than a human.
+Shield Trap Void>Guardian|Control/protection for a mage-type tank. Powerful but needs skill and judgement.
+Bird Discord Song>Harpy|
+Claw Malign Song>Harpy|
+Discord Song Wing>Harpy|
+Axe Hunt Plant>Harvest|
+Earth Plant Sickle>Harvest|
+Myriad Renewal Snake>Hydra|
+Blood Potent Renewal>Immortal|A tank or healer; likely a bit of both.
+Growth Might Renewal>Immortal|Big and hard to kill.
+Life Magic Renewal>Immortal|
+Iron Might Swift>Juggernaut|More of a personal, 'become the Juggernaut' combo.
+Might Swift Vehicle>Juggernaut|More likely to involve assault vehicle conjuration and vehicle buffs.
+Balance Magic Rune>Karmic|Clive Standish's combo.
+Omen Rune Star>Karmic|
+Deep Might Octopus>Kraken|
+Deep Myriad Potent>Kraken|
+Might Octopus Vast>Kraken|
+Deep Might Vast>Leviathan|
+Fish Vast Water>Leviathan|
+Harmonic Plant Water>Lotus|Beth Cavendish's combo.
+Plant Sword Water>Lotus|Cheryl Asano's combo.
+Armour Magic Technology>Magitech|
+Lightning Magic Technology>Magitech|A tech-based staff that amplifies and refines electricity. Give it a power grid or lightning spells and you're off.
+Cat Spike Venom>Manticore|
+Adept Bow Swift>Master|High mobility combat archer, more rapid-fire than sniping.
+Adept Cloth Needle>Master|
+Adept Dance Sword>Master|
+Adept Dance Whip>Master|
+Adept Fire Hammer>Master|A smithing combination, more crafting than fighting.
+Adept Fire Iron>Master|
+Adept Foot Hand>Master|
+Adept Gathering Gun>Master|Sniper. Asya Karadeniz's combo.
+Adept Gun Hand>Master|Gun Fu master.
+Adept Gun Swift>Master|Quick draw artist.
+Adept Iron Technology>Master|Weaponsmithing combination.
+Adept Knife Smoke>Master|Assassin build using smoke to disable and obscure.
+Adept Magic Potent>Master|Basically an archmage confluence with lots of utility and magic manipulation.
+Adept Magic Sword>Master|Magic swordsman. Very popular: available, high skill ceiling, versatile. Akari Asano's combo.
+Adept Myriad Sword>Master|Lance's combo (Padma's team leader): duplicating himself, dancing blades, waves of razor force.
+Adept Needle Thread>Master|Tailor-type crafting specialist who mixes in some combat abilities.
+Adept Swift Sword>Master|The 'Classic Swordsman', all common essences. Rufus' grandfather's combo; also Valdis Volaire's.
+Adept Thread Whip>Master|Mono-filament whip.
+Cloth Needle Thread>Master|Crafting specialist of the tailor variety.
+Dance Song Sword>Master|
+Dance Sword Thread>Master|Dancing swords.
+Foot Knife Swift>Master|Network scout Woolzy's combo: bursts of movement and summoned daggers.
+Life Pure Renewal>Ministration|Ian Evans' combo.
+Cattle Hunt Might>Minotaur|
+Cattle Might Trap>Minotaur|
+Dimension Shimmer Vast>Mirage|Space-warping wide-area terrain illusions.
+Fire Light Water>Mirage|Offence, deception and healing. A strong choice for the rare solo adventurer.
+Sand Sun Visage>Mirage|An iconic desert combination, extremely strong in the right environment.
+Sun Vast Water>Mirage|Goes all-in on wide-area illusions.
+Earth Growth Might>Monolith|Very powerful but not great in enclosed spaces.
+Adept Water Wind>Mystic|Master of flow.
+Balance Dimension Harmonic>Mystic|Child of the infinite.
+Balance Hand Iron>Mystic|Iron monk.
+Iron Might Serene>Mystic|
+Balance Swift Sword>Mystic|
+Balance Swift Wind>Mystic|Sophie Wexler's combo.
+Blood Renewal Sword>Mystic|
+Dark Knowledge Pure>Mystic|
+Dark Song Vast>Mystic|Spectral musician.
+Harmonic Knowledge Pure>Mystic|Immaculate sage.
+Magic Might Staff>Mystic|Emir Bahadir's combo. Also Shirtaloon's pick for the Monkey King.
+Magic Omen Vast>Mystic|Zone magic specialist.
+Magic Sword Wind>Mystic|
+Cloud Vast Void>Nebula|Wide area: energy clouds to attack, drain enemies, empower allies and restore their mana.
+Balance Mirror Void>Nemesis|Summon clones of your enemies, with antithetical abilities.
+Myriad Technology Vast>Network|Nik's combo: a support hub that coordinates the team. (Patreon preview chapters; may change.)
+Earth Sand Water>Oasis|
+Vast Vehicle Water>Ocean|
+Adept Might Potent>Onslaught|Lucian's combo: very strong in melee with powerful AoE special attacks.
+Adept Might Swift>Onslaught|Powerful, cheap: speed, skill and strength in a very physical package.
+Bow Gathering Myriad>Onslaught|Expensive artillery, glass-cannon archer with rain-of-arrows abilities.
+Fire Gun Vehicle>Onslaught|
+Growth Might Zeal>Onslaught|Highly aggressive 'Hulk' combo.
+Growth Renewal Zeal>Onslaught|"The madder Hulk gets, the stronger Hulk gets."
+Gun Might Potent>Onslaught|The exception to 'bows are better at burst': weapons that should not be man-portable, made hand-held.
+Gun Might Vehicle>Onslaught|Tanks, APCs, attack helicopters.
+Gun Vehicle Wind>Onslaught|
+Hand Might Swift>Onslaught|
+Might Potent Swift>Onslaught|Thalia Mercer's combo.
+Might Potent Vast>Onslaught|Jack Gerling's combo. A hardcore wide-area buff build.
+Might Swift Wind>Onslaught|
+Myriad Vast Visage>Phantasmagoria|Crazy rare (two legendaries and an epic). Sophisticated wide-area illusions.
+Fire Renewal Wing>Phoenix|Henrietta Geller's combo.
+Bow Dark Hunt>Predatory|
+Bow Hunt Trap>Predatory|Classic hunter-survivalist.
+Bow Spider Trap>Predatory|Creepier hunter-survivalist.
+Hunt Myriad Wolf>Predatory|The kind of combo the leader of an assassin or stealth group would have.
+Spear Spider Wing>Predatory|
+Cage Lightning Myriad>Prison|Lightning cages.
+Cage Rune Trap>Prison|
+Chain Iron Myriad>Prison|Ball and chain.
+Gathering Iron Might>Prison|
+Shield Trap Vast>Prison|Force bubbles.
+Adept Balance Renewal>Prosperity|
+Balance Renewal Rune>Prosperity|Hiro Asano's combo.
+Feast Foot Rabbit>Prosperity|
+Growth Omen Sun>Prosperity|
+Growth Renewal Shield>Prosperity|Neil Davone's combo.
+Magic Rune Vast>Prosperity|A considered combo for Hiro Asano.
+Balance Echo Ice>Refracting|
+Bird Needle Song>Resonating|
+Crystal Harmonic Serene>Resonating|
+Echo Swift Wind>Resonating|
+Bird Might Vast>Roc|
+Blood Dimension Goat>Sacrifice|
+Dimension Knife Sin>Sacrifice|
+Hunger Knife Sun>Sacrifice|
+Hand Paper Rune>Scribe|
+Knowledge Paper Serene>Scribe|
+Fire Iron Snake>Serpent|
+Fire Snake Water>Serpent|
+Fire Snake Wind>Serpent|
+Paper Sword Visage>Simulacrum|More physical combat related.
+Adept Bow Hunt>Skirmish|High mobility hit-and-run archer, combining stealth and mobility.
+Cloud Swift Wind>Sky|
+Moon Star Sun>Sky|
+Star Sun Vast>Sky|Extreme mobility, abilities that change with time of day and weather. Avoided for lack of reliable powers.
+Bird Swift Wind>Soaring|
+Ship Water Wind>Soaring|Sailing combo that moves into airship territory at higher ranks.
+Swift Vehicle Wind>Soaring|Kaito Asano's combo. Generally non-combat, based on flight.
+Adept Balance Potent>Sovereign|Manipulates, steals and counters enemy abilities; subtly skews a battle.
+Adept Potent Sceptre>Sovereign|Pure leadership: communication, buffs, and attacks that draw on allies' strength.
+Dark Sin Water>Sovereign|Domination of an underwater environment, with buffs, debuffs and environment control.
+Flesh Magic Thread>Sovereign|Body control (puppeteering).
+Dark Star Sun>Stellar|Light-in-the-dark jack-of-all-trades. Best solo or in a very large group.
+Cloud Crystal Wind>Storm|Diamond dust area attacks.
+Deep Vast Wind>Storm|Hurricanes and whirlpools.
+Dust Ice Wind>Storm|Wide area control and attack based on storms of razor-sharp ice fragments.
+Earth Fire Wind>Storm|
+Fire Gun Lightning>Storm|Flamethrowers and lightning cannons. Maximum output for minimum skill.
+Fire Potent Wind>Storm|
+Hammer Lightning Rune>Storm|
+Lightning Magic Wind>Storm|Crazy amounts of speed; weird weather spells or hard-to-pin-down attacks like Farrah's.
+Lightning Potent Wind>Storm|Thadwick Mercer's combo.
+Sand Vast Wind>Storm|Wide area attack specialist. Less immediate power but very enduring.
+Flesh Sin Visage>Succubus|
+Hunger Magic Sin>Succubus|
+Bat Rabbit Rat>Swarm|
+Blood Myriad Wing>Swarm|
+Dark Fire Rat>Swarm|
+Duck Flea Foot>Swarm|
+Fire Venom Wasp>Swarm|
+Potent Venom Wasp>Swarm|
+Magic Paper Rune>Talisman|More spell-casting and craft oriented.
+Bird Lightning Vast>Thunderbird|
+Balance Dimension Swift>Time|Danielle Geller's combo.
+Dimension Vast Void>Time|
+Balance Moon Water>Tranquil|Healing, with an emphasis on dispelling enemies and cleansing allies.
+Corrupt Death Serene>Tranquil|Affliction specialist focused on subduing with death-like effects.
+Serene Tree Vast>Tranquil|
+Adept Elemental Magic>Transfiguration|Jory Tillman's combo.
+Axe Bear Moon>Transfiguration|
+Balance Earth Iron>Transfiguration|The 'human smelting machine' Jason bought his gold from.
+Balance Fire Ice>Transfiguration|Steam-related abilities.
+Bear Growth Hand>Transfiguration|Dean's combo (the fergax summoner).
+Bird Mouse Whale>Transfiguration|
+Blood Fire Iron>Transfiguration|
+Deer Earth Hammer>Transfiguration|
+Flesh Growth Water>Transfiguration|Might grow in size by absorbing water.
+Hunger Moon Wolf>Transfiguration|The 'black out and eat the townsfolk' werewolf.
+Hunt Moon Wolf>Transfiguration|
+Bird Water Wind>Transgression|Swimming birds. A specialty combo for the right job or location.
+Fish Water Wind>Transgression|Flying fish. A specialty combo for the right job or location.
+Corrupt Pure Sin>Transgression|Behavioural transgression.
+Death Dimension Magic>Transgression|Spirit necromancy. They'll hunt you down for this one.
+Death Dimension Life>Transgression|Necromancy with a focus on higher-order undead, like vampires.
+Moon Myriad Sun>Transgression|
+Blood Might Renewal>Troll|
+Dark Light Moon>Twilight|
+Moon Omen Wind>Twilight|
+Bat Blood Death>Undeath|
+Blood Bone Corrupt>Undeath|
+Blood Corrupt Dark>Undeath|Vampires with nasty minions: blood-sucking ghouls and plague zombies.
+Blood Dark Death>Undeath|
+Blood Death Duck>Undeath|
+Blood Death Hunger>Undeath|One of the most dangerous (to public safety) vampire builds.
+Blood Death Hunt>Undeath|
+Blood Death Moon>Undeath|
+Blood Death Sin>Undeath|
+Blood Death Snake>Undeath|Snake vampire.
+Blood Death Spider>Undeath|
+Blood Death Visage>Undeath|
+Blood Death Wolf>Undeath|
+Bone Corrupt Dance>Undeath|Skeleton-focused; a bit of a B-list restricted combination.
+Bone Corrupt Flesh>Undeath|
+Corrupt Dance Flesh>Undeath|Zombies and carrion-eating ghouls. Not highly regarded.
+Death Flesh Hunger>Undeath|Could go ghoul or zombie. Neither is a winner.
+Death Magic Sand>Undeath|Mummification.
+Mirror Myriad Technology>Unity|Scouting combo that excels in short-range communication.
+Earth Plant Rake>Verdant|A take on a farming combo.
+Earth Plant Vast>Verdant|Ken Asano's combo.
+Earth Shovel Water>Verdant|One of many useful farming combinations.
+Balance Blood Crystal>Vessel|Drain enemies, heal allies.
+Balance Blood Hunger>Vessel|Combat healer: drain attacks, giving the health to allies.
+Balance Life Needle>Vessel|Arabelle Remore's combo (Rufus' mother): stores life force taken from enemies to fuel healing.
+Cloud Growth Vehicle>Vessel|
+Crystal Magic Potent>Vessel|Support: buffs and mana recovery.
+Death Vehicle Water>Vessel|
+Dimension Vast Vehicle>Vessel|
+Duck Iron Vast>Vessel|
+Duck Iron Visage>Vessel|
+Gathering Magic Star>Vessel|Storage-side Vessel: store up power for big unusual-damage attacks. A classic carry.
+Iron Sin Wind>Vessel|
+Knowledge Technology Vast>Vessel|Utility/surveying: data gathering, storage and communication.
+Rat Swift Water>Vessel|
+Technology Vehicle Wind>Vessel|
+Dark Omen Serene>Vision|
+Eye Magic Mirror>Vision|Could be a counter-spell / spell mimic power set.
+Earth Fire Potent>Volcano|Farrah Hurin's combo.
+Earth Fire Vast>Volcano|Don't stand in the fire.
+Corrupt Dimension Void>Vortex|
+Dark Void Wind>Vortex|Powerful area attack/control, but likely precision and friendly-fire problems.
+Deep Vast Void>Vortex|
+Dimension Hunger Void>Vortex|
+Feast Magic Void>Vortex|Less physical vortexes, more countering abilities and absorbing magic.
+Shark Water Wind>Vortex|
+Trap Void Wind>Vortex|
+Dance Myriad Thread>Weave|
+Dance Needle Thread>Weave|Crafting or heavy combat: needle storms, razor nets, evasive patterns that become traps.
+Harmonic Myriad Omen>Weave|Fate and destiny through prediction. Merlin-type advisors. Crazy expensive.
+Flesh Hunger Might>Wendigo|Yay cannibalism.
+Adept Fire Zeal>Wrath|Witch-finder type: tracking and perception with destructive attacks.
+Balance Blood Might>Wrath|A berserker that gets stronger the more it gets attacked.
+Balance Might Zeal>Wrath|'Righteous wrath', favoured by churches, more physical.
+Balance Potent Zeal>Wrath|
+Dimension Light Potent>Wrath|Expensive, spell-oriented, extremely high chance of transcendent damage powers.
+Fire Light Potent>Wrath|High offence, on the spell-oriented end of Wrath.
+Fire Light Zeal>Wrath|Pure destructive wrath. Often produces spellzerker powers.
+Might Potent Zeal>Wrath|The quintessential Wrath confluence, often with heavy team buffs.
+Bird Vast Wind>Ziz|`;
+
+// Restricted (Restricted Combos sheet)
+const RESTRICTED_ESS = ['Corrupt','Death'];
+const RESTRICTED_CONF = ['Cyborg','Sacrifice','Succubus','Undeath','Wendigo'];
+const RESTRICTED_EXTRA = ['Fungus Growth Zeal','Blood Hunger Locust','Hunger Moon Wolf'];
+
+// Awakening stones that are confirmed in the Info sheet: name|rarity|note
+const STONE_RAW = `Absolution|E|
+Acid|U|
+Adventure|R|
+Air|?|
+Anticipation|U|
+Apocalypse|L|From Looting Power.
+Avatar|L|Known for summoning powers and powerful buffs (enhancement and transformation).
+Barrier|?|
+Bow|?|
+Calling|E|Higher chance than most stones to produce summoning powers (along with Gate).
+Celestial|L|From Looting Power.
+Champion|E|
+Death|?|
+Defiance|?|
+Dimension|L|
+Earth|C|
+Echo|?|
+Eye|C|Above average chance of awakening aura powers. Looks like an oversized glass eye.
+Feast|C|Very dark red in colour.
+Feeble|C|Above average chance of awakening aura powers.
+Fire|C|
+Fish|C|
+Focus|U|
+Foot|C|A plain peach colour.
+Gate|L|Higher chance than most stones to produce summoning powers (along with Calling).
+Growth|?|
+Gun|C|
+Hand|C|A plain peach colour.
+Hunt|?|
+Inevitability|E|
+Judgement|R|
+Karma|L|
+Lightning|?|
+Magus|C|
+Mediocrity|C|Joke stone.
+Might|?|
+Moment|E|
+Myriad|?|
+Omens|E|Contains the power of destiny. When someone lacks an aura power there is a significant chance it produces one. Used by Jason to awaken his aura. Like dark glass with a faint moonlight radiance.
+Persistence|R|
+Plant|C|
+Potency|?|
+Preparation|U|
+Puberty|?|Joke stone (probably).
+Purgation|E|Clear, with such clarity as to be hard to see.
+Radiant|?|
+Rain|C|Blue.
+Rat|C|
+Reach|U|
+Reaper|L|From the Great Astral Being, the Reaper. A light-devouring black.
+Rebirth|L|
+Ruin|R|
+Sand|?|
+Shield|C|
+Sky|E|Blue, with streaks of white.
+Snake|C|
+Song|U|Best bargain for awakening an aura power, because Song is usually cheap: people avoid its loud, attention-grabbing powers.
+Spider|?|
+Stars|E|Black, with tiny speckles that seem to move like tiny stars.
+Surge|U|
+Swiftness|?|
+Sword|?|
+Vision|U|
+Wall|?|
+Water|?|
+Wheel|?|
+Wind|?|
+Wrath|U|A burning, shifting red, wreathed in white-gold light.`;
+const STONE_RENAME = {Swift:'Swiftness', Potent:'Potency', Omen:'Omens', Karmic:'Karma', Star:'Stars', Magic:'Magus'};
+const JOKE_STONES = ['Mediocrity','Puberty'];
+
+const SHARED = {
+ bowgun: "Bow and Gun share a heavy propensity to produce special attacks, and that spreads to the other essences in the combination. Conjured guns are more practical: better fire rate, faster projectiles, less arc, better for sustained damage, and usually 2 to 4 conjuration powers. Conjured bows hit harder and get more overtly magical enhancements, making Bow usually the better burst-damage choice with more special attacks. Both can conjure crossbows. Gun combines into far fewer confluences than Bow.",
+ particle: "Sand, Dust and Smoke are all uncommon and sit on a spectrum of particulate clouds. Sand is heavy and physical (sand clones, walls, scouring and burying). Smoke is the opposite: ephemeral, popular with affliction specialists and assassins for obscuring and poison, and a great wide-area delivery system for afflictions. Dust sits in the middle, excelling at physical residue that combines control and affliction delivery.",
+ dogwolf: "Dog is like a more varied Wolf: less specialised, more versatile. Both have pack aspects. Wolf group abilities affect small groups with trust requirements (like Jason's Spirit Vault) but are strong. Dog has broader effects and targets with weaker requirements and weaker effects, and survives in a wider array of environments.",
+ mouserat: "A Mouse essence leans toward size and evasiveness; a Rat essence toward disease, consumption and swarming."
+};
+const ESS_NOTE = {
+Adept:"Skill in many flavours, depending on its partners. With Magic, tricky uses of spells, wands and staves. Adept + Rune picks up ritual tricks like Clive's. With a weapon, physical skills for that weapon. Frequently leads to the Master confluence.",
+Balance:"Colours divided by a dead-straight line down the middle, constantly shifting in contrast: red and blue, black and white, green and purple.",
+Blood:"Its surface looks slick, as if wet with blood, and it is warm to the touch.",
+Bow:"@bowgun",
+Cattle:"Includes both cows and bulls. Abilities around charging and stampeding; used in the Minotaur confluence.",
+Crystal:"Often a platform for other aspects of the combo: storing mana, elemental forces, life force, even copied powers. Frequently combos into Vessel, and with Light often produces Phantasmagoria.",
+Dark:"The most common Dark perception power is the most generalist, the one Jason has. Great utility and the last word in stealth. Pitch black and glossy like onyx, yet it seems to absorb light.",
+Death:"Restricted. Divine Death is not. Has an entropy aspect: e.g. a power from a Magus stone might hyper-accelerate the duration of in-place magic, a back-end dispel.",
+Deep:"Add Water and you're in oceanic territory; a favourite of seafaring essence users. Deep can be more metaphorical, depending on its partners.",
+Dimension:"Space effects, overtly gravity-related powers, and anything astral.",
+Dog:"@dogwolf",
+Dust:"@particle",
+Earth:"A common perception ability is tremor-sense, detecting things in or on the ground over large distances.",
+Elemental:"More sophisticated and nuanced; favoured by alchemists, item makers and nature-loving druids. Single-element essences are simpler but much better for combat.",
+Fire:"Like glass containing a swirling mix of red, orange and yellow.",
+Fish:"Common in and around bodies of water with a lot of fish.",
+Foot:"Lots of sweet kicking and mobility powers.",
+Fork:"Pitchforks for a farmer, dining forks for a cooking-magic specialist (often with Knife). Combat users get powers that split single-target effects to a second target, but the chance of errant utility powers is high.",
+Fungus:"Acceptable and often used by affliction specialists, so long as it isn't part of an Animate combo.",
+Gathering:"For snipers: charge attacks that slowly gather ambient magic to fire one big shot. Black and white.",
+Glass:"Generally considered an elemental sub-type, like Ice and Lightning. The most directly combative of Glass, Crystal and Mirror, but also awakens many observation powers.",
+Grazen:"Kind of like a predatory armadillo with razors on its shell that attacks with rolling charges.",
+Growth:"Green, ephemeral and swirling, as if full of liquid.",
+Gun:"@bowgun",
+Hair:"Jason thinks Snake and Earth could be added for a Medusa confluence (it's Gorgon).",
+Hammer:"One of the most popular tool essences, since many smiths adventure on the side. Counts as both tool and weapon.",
+Hunger:"Drain and absorption powers, aimed at control and debuffs. With Magic, mana drain; with Blood, health drain. A more specific relative of Feast.",
+Hunt:"Methodical and skill-based like a human hunter, and often produces Predatory.",
+Iron:"Catch-all for metals and metal-related phenomena, such as magnets.",
+Knife:"Counts as both tool and weapon.",
+Knowledge:"Skill book abilities and faster learning of physical tasks. Appears in libraries and schools, not just near smart people.",
+Light:"Generic, so its powers depend heavily on the combo, almost like a confluence: laser beams, healing, illusions or blinding special attacks.",
+Lightning:"Dark blue, with lightning arcing inside from a central orb, like a plasma sphere.",
+Locust:"Summoned locusts will be monstrous varieties. Swarming animal essences are prime candidates for swarm familiars.",
+Lurker:"Large, vaguely humanoid creatures that excel at stationary stealth, with short bursts of speed. Jason fought a Bark Lurker in his assessment.",
+Magic:"The second most popular essence. Often evolves a human racial gift toward spells. A glowing blue cube.",
+Manatee:"Damage soaking, aquatic mobility in short bursts, sound-based perception and communication, and monstrous manatee summons.",
+Might:"The most popular essence. A dark brown cube, warm and leathery, that pulses very gently under the fingers.",
+Mouse:"@mouserat",
+Myriad:"All about numbers and 'meta' abilities that alter other abilities, like multiplying a ranged attack. A grail essence for Bow users. High chance of a 'fourfold' essence gift, and often Swarm with small animals.",
+Needle:"An adventurer favourite combat crafting essence.",
+Plant:"Like an opal with a rich green base under darker greens; also described as dark earthy brown riddled with green like roots in soil.",
+Potent:"Strength of magical and esoteric effects, versus Might's direct physical power. Synergises with spells; active powers are often short-lived boosts.",
+Pure:"Translucent.",
+Rake:"Leans utility; favoured by farmers and herbalists. Its combat powers tend to be rather nasty.",
+Rat:"@mouserat",
+Renewal:"One of the most sought-after healing essences.",
+Rune:"Frequently grants the ability to have more than one magical tattoo.",
+Sand:"@particle",
+Serene:"Affects individuals (Tranquil affects the environment). Tends toward cleansing and mana/stamina recovery. An alternative to Pure.",
+Shield:"Catch-all essence for barriers in general.",
+Shimmer:"Hard-to-spot abilities and illusions. Interesting with Mirror, Song, Light, Vast and especially Dimension.",
+Shovel:"Might produce the power to summon a giant earthworm.",
+Sin:"Not the Christian sins: a transgression against a subjective set of values. Forms at religious sites with strict gods. White jade flecked with gold.",
+Sloth:"Possible abilities: slowing debuffs, heightened resistances, claw powers and camouflage. (Unverified.)",
+Smoke:"@particle",
+Snake:"Frequently produces the Serpent confluence.",
+Technology:"Its big edge is communication. Magitech is cheaper and more efficient at the low end; artifice is better at the high end. Often evolves a human racial gift toward conjuration.",
+Tentacle:"Much harder to find than normal epics because of where it manifests.",
+Thread:"A specialised tool essence often used with Needle and Cloth. Often leads to Master; at home in crafting, combat, or both.",
+Trap:"Commonly produces some form of area control power.",
+Vast:"The blue of an open summer sky, with clouds that seem to float through the cube.",
+Vehicle:"Leads into Vessel very often, much like Adept into Master.",
+Visage:"Small-scale, intricate, personal illusions (Mirage is wide-area).",
+Void:"Close to Dimension but more focused on physical reality. Not inherently sinister, yet always ends up in combos that are.",
+Water:"The most common healing essence: less reliable than Renewal or Life, but much easier to get. Shimmering and blue.",
+Wheel:"Combines nicely with destructive elemental stones like Lightning and Fire for combat spells.",
+Wind:"Air powers are the most iconic area powers. Roiling white with streaks of pale grey and blue.",
+Wing:"Almost certain to give flight, and combines into famous confluences like Dragon, Phoenix and Garuda.",
+Wolf:"@dogwolf",
+Zeal:"Commonly leads to the Wrath confluence. Often produces buff, attack and resistance powers."
+};
+const CONF_NOTE = {
+Action:"All supplemental powers for running around being hardcore. A soldier from volume two has it.",
+Alchemy:"Water + Elemental is the closest known pair. An excellent platform for potions, oils and adventurer consumables.",
+Ambush:"Centred on assassination: lay-in-wait (usually Trap) or sneak-up-and-strike (Knife, Dark, Swift, Adept). Cheap essences, steep skill requirements.",
+Animate:"Not all Animate combos are restricted, just the ones that do things like make zombie fungus.",
+Anzu:"Kind of a giant griffin.",
+Avatar:"Embodiment. Signature powers include summons, familiars, and buffs that embody concepts.",
+Behemoth:"The general confluence for giant land creatures.",
+Boundary:"Something of an opposite to Eclipse: it separates. Great against incorporeal, astral and summoned entities.",
+Cataclysm:"Conflicting forces plus an escalation essence like Potent or Vast. Simple, wide-area destruction.",
+Charlatan:"Known for shape-shifting and illusions. Swirling muted colours that form almost-recognisable ghostly shapes.",
+Chimera:"Creatures that differ but aren't too structurally disparate. Triple animal essences almost always give Chimera.",
+Cyborg:"Restricted for its potential for behaviour modification. Flesh plus Iron and/or Technology are key. The user may modify others rather than themselves.",
+Cycle:"Sister to Eclipse; day and night, life and death, seasons. Swap Dark for Renewal in Light+Dark+Balance and it becomes a dawn cycle.",
+Dawn:"Beginnings and creation: buffs, mana restoration, cooldown resets, cleansing, anti-stealth.",
+Desolate:"Drain attacks, debuffs and zone spells; often drains the environment itself. Death-based ones are restricted.",
+Discordant:"Restricted due to Corrupt in its only combo, despite being unlikely to produce anything too nasty.",
+Doom:"A focused, certain demise. Makes your essences really sure they kill what you aim them at. Like a yin-yang lava lamp.",
+Dragon:"Many combos use common essences, but they're popular so they cost more on the market.",
+Eclipse:"Diametrically contrasting ephemeral forces plus a balancing third. Powers let opposites work in harmony toward a big finale.",
+Empower:"Super common because many hodge-podge combinations produce it. Generic powers.",
+Fertile:"Compared to Verdant: more likely to affect fauna, more recovery, more internal.",
+Firebird:"Primal and destructive, like the golden crow, without Phoenix's esoteric side powers.",
+Forge:"An explicit crafting confluence; tricky without a tool or weapon essence. Adding Adept tends to give Master instead.",
+Gate:"Extremely rare, usually needing multiple legendaries, one always Dimension. Great against incorporeal and summoned things.",
+Glimeron:"A Pallimustus creature like a six-legged pangolin with semi-reflective scales, a venomous bite and fire breath.",
+Harvest:"The farmer confluence, including familiars like giant worms.",
+Kraken:"A specific, extremely powerful creature. Octopus really helps lock it in.",
+Magitech:"Crafting confluence for magical versions of sophisticated devices. Magic + Technology almost always gives it.",
+Manticore:"A lion's body with a scorpion's tail.",
+Master:"Expertise, whether hammering iron or bad guys. Adept is the most common component. Synergises strongly with other essences' powers.",
+Ministration:"One of the most healing-focused confluences.",
+Minotaur:"Usually Cattle, Might and a third like Trap or Hunt.",
+Mirage:"Wide-area illusions (Visage is small-scale and personal).",
+Monolith:"Big: strong defences, earth-shaping fortifications, towering summons, place-of-power zone spells.",
+Mystic:"A common confluence; Balance, Harmonic, Adept, Hand or Staff are especially likely components. A vibrant blue.",
+Network:"From Patreon preview chapters; may change.",
+Oasis:"A classic healer confluence, common in Greenstone. Tends toward wide-area healing.",
+Phantasmagoria:"Centred on semi-tangible illusions.",
+Predatory:"Innate gifts like a wolf's, where Hunt is a human hunter's method.",
+Prosperity:"The closest there is to a luck essence.",
+Refracting:"Heavy on meta powers that alter the parameters of other abilities.",
+Resonating:"Escalating effects and effects on multiple targets in the same or opposing ways; resonating-force damage.",
+Roc:"A really big bird.",
+Sacrifice:"Restricted across the board: it incentivises victimising innocents.",
+Scribe:"The main source of ink or pen abilities.",
+Serpent:"Big on serpent monsters as summons, familiars or thematic powers.",
+Sovereign:"Leadership, domination, communication, buffs and counters. Rare: most combos need an epic or legendary.",
+Storm:"Complementary elemental forces plus Potent or Vast. High impact at low skill.",
+Swarm:"Myriad with small animals usually produces it.",
+Thunderbird:"A giant bird with thunder and lightning powers.",
+Time:"Mostly self-buffs, speed and slows; time loops on attacks; cooldown tricks. Never real time travel.",
+Tranquil:"Affects the environment (Serene affects individuals).",
+Transfiguration:"One of the most common confluences. Can blend animals or raise them to higher states. Best for refining materials in crafting.",
+Transgression:"All about boundaries: two essences on either side, and a third that belongs to one or neither.",
+Twilight:"Endings: debuffs, mana drain, cleansing, dispels, often stealth or illusion.",
+Undeath:"Death is about getting to dead; Undeath is about what you do once you're there.",
+Verdant:"Compared to Fertile: usually flora, more buffs, more external.",
+Vessel:"Transport, exchange or container. A transport power is very common, shaped by the other essences.",
+Vision:"More likely than most to awaken a fourfold perception gift in humans.",
+Weave:"Highlights the many ways a concept can be interpreted: crafting, combat, or fate.",
+Wrath:"Highly offensive with a high propensity for transcendent damage. Berserker or 'power of judgement' flavours.",
+Ziz:"An apocalypse beast bird of geographically large size."
+};
+
+const RACES = [
+ ['Human','Special Attack Aptitude, Human Ambition, 4 Essence Gifts'],
+ ['Elf','Spell Aptitude, Magic Affinity, Life Affinity, Nature Affinity, Mystic Bloodline, Grace'],
+ ['Celestine','Special Ability Aptitude, Holy Affinity, Astral Affinity, Mana Integrity, Celestial Bounty, Celestial Swiftness'],
+ ['Leonid','Boon Aptitude, Leonid\'s Roar, Sprint, Tireless, Ancestral Strength, Ancestral Swiftness'],
+ ['Runic','Spell Aptitude, Magic Affinity, Mana Beacon, Adaptive Resistance, Spellborn, Wellspring'],
+ ['Draconian','Draconic Power, Magic Affinity, Dragon Breath, Dragon Scales, Draconic Might, Dragon Ancestry'],
+ ['Smoulder','Earth Affinity, Fire Affinity, Flame Investiture, Heart of the Earth, Life Fire, Earth Born']
+];
+
+
+// ===== Extra reference lists =====
+const RACE_INFO = {
+Human:{d:"Humans are often still the dominant race in most cities, even in other worlds.",a:[["Special Attack Aptitude","More likely to awaken special attacks; special attacks have increased effect."],["Human Ambition","Essence abilities advance more quickly (roughly 10-15%)."],["Essence Gifts (x4)","One racial ability evolves each time a new essence is absorbed."]]},
+Elf:{d:"The second most common race on Pallimustus. Definitely pointy ears.",a:[["Spell Aptitude","More likely to awaken spells; spells have increased effect."],["Magic Affinity","Magic sub-type effects and boons are enhanced; more resistance to magic effects."],["Life Affinity","Effects with a positive effect on life are stronger."],["Nature Affinity","Related abilities and resistances are enhanced."],["Mystic Bloodline","Increased maximum mana."],["Grace","Enhanced agility."]]},
+Celestine:{d:"Metallic hair with matching eyes. Born from two outworlder parents. The most common of the rarer races; the majority in the Storm Kingdom.",a:[["Special Ability Aptitude","More likely to awaken special abilities; they have increased effect."],["Holy Affinity","Holy resistance, stronger holy abilities and damage, stronger healing and holy boons."],["Astral Affinity","Resistance to dimension and astral effects; stronger dimension abilities and transcendent damage."],["Mana Integrity","Lower ongoing mana costs; resistance to mana drain."],["Celestial Bounty","Increased mana recovery."],["Celestial Swiftness","Increased speed and reflexes."]]},
+Leonid:{d:"Large anthropomorphic lions with better stamina recovery and lower stamina use. Typically wear only the bare minimum of clothing.",a:[["Boon Aptitude","More likely to awaken boon abilities; boons have increased effect."],["Leonid's Roar","Roar to boost nearby allies' Power and Speed."],["Sprint","Run at extreme speed for extreme stamina."],["Tireless","Resistance to stamina drain; abilities use less stamina."],["Ancestral Strength","Increased physical strength."],["Ancestral Swiftness","Increased speed and reflexes."]]},
+Runic:{d:"Generally bald and stocky with very dark skin, born with glowing tattoo-like runes on their skin and bones.",a:[["Spell Aptitude","More likely to awaken spells; spells have increased effect."],["Magic Affinity","Magic sub-type effects and boons are enhanced; more resistance to magic effects."],["Mana Beacon","Active ability that stabilises ambient magic."],["Adaptive Resistance","More resistance to recently encountered effect types."],["Spellborn","Increased maximum mana."],["Wellspring","Increased mana recovery."]]},
+Draconian:{d:"Claim descent from dragons. Tiny scales instead of skin, can breathe fire, typically tall and well built.",a:[["Draconic Power","Certain spell types are much stronger, depending on dragon ancestry."],["Magic Affinity","Magic sub-type effects and boons are enhanced; more resistance to magic effects."],["Dragon Breath","A special attack whose form depends on ancestry."],["Dragon Scales","Resilience to most damage and resistance to certain effects."],["Draconic Might","Enhanced physical strength."],["Dragon Ancestry","Sets the specifics of the other racial gifts and modifies some essence abilities."]]},
+Smoulder:{d:"Dark skin with glowing red or orange eyes. Strong earth and fire affinities; known to live near volcanic areas.",a:[["Earth Affinity","Details unknown."],["Fire Affinity","Details unknown."],["Flame Investiture","Active ability to superheat objects."],["Heart of the Earth","More stamina and mana recovery while meditating."],["Life Fire","Health and stamina recovery based on heat."],["Earth Born","Enhanced innate damage reduction."]]},
+Outworlder:{d:"Pulled from one world to another through the deep astral as a disembodied soul and reborn. They lose previous racial gifts and gain new ones that help them survive. Two outworlders' child is a Celestine.",a:[["Astral Affinity","Resistance to dimension and astral effects; stronger dimension abilities and transcendent damage."],["Other gifts","Vary from outworlder to outworlder."]]},
+Goblin:{d:"Mentioned once in book 5, when a transformation zone turned humans in Detroit into goblins.",a:[]}
+};
+
+// Conditions: name|tags|description
+const COND_RAW = `Blood Frenzy|Boon, Unholy, Stacking|Bonus to Speed and Recovery. Stacks up to a maximum threshold.
+Blood of the Immortal|Boon, Healing, Unholy, Stacking|When damaged, an instance is consumed for a strong, short heal-over-time. Extra instances don't add together.
+Bleeding|Affliction, Wounding, Blood|Ongoing damage from blood loss. As a wounding effect it soaks up some incoming healing, then ends.
+Leech Toxin|Damage-Over-Time, Poison, Stacking|When Bleeding is negated, an instance is consumed to reapply Bleeding.
+Tainted Meridians|Affliction, Poison|Higher stamina and mana costs, stronger drains against them, and bleeding also drains mana.
+Necrotoxin|Damage-Over-Time, Poison, Stacking|Ongoing necrotic damage until cleansed. Stacks.
+Sacrificial Victim|Affliction, Unholy|Drain attacks and blood afflictions are stronger against them.
+Blood from a Stone|Affliction, Magic|Negates immunity to blood and poison, even for things without blood. Can't be cleansed while a blood or poison affliction remains.
+Creeping Death|Damage-Over-Time, Disease, Stacking|Ongoing necrotic damage until cleansed. Stacks.
+Rigor Mortis|Affliction, Unholy, Stacking|Penalty to Speed and Recovery. Each new instance deals necrotic damage per existing instance.
+Weakness of the Flesh|Affliction, Magic|Negates immunity to disease and necrotic damage. Can't be cleansed while a disease remains.
+Inescapable|Affliction, Magic|Can't be affected by friendly teleport or dimension effects.
+Persecution|Affliction, Curse, Stacking|Resists incoming boons, recovery, cleansing and heal-over-time, and can't lower that resistance. Stacks.
+Penitence|Affliction, Holy|Gain a Penance instance for each curse, disease, poison or unholy effect cleansed from you.
+Penance|Affliction, Holy, DoT, Stacking|Ongoing transcendent damage; instances drop off as damage is dealt.
+Vulnerable|Affliction, Unholy, Stacking|All resistances reduced. Stacks. Cancels Resistant one for one.
+Ruination of the Blood|Damage-Over-Time, Poison, Stacking|Ongoing necrotic damage until cleansed. Stacks.
+Ruination of the Flesh|Damage-Over-Time, Disease, Stacking|Ongoing necrotic damage until cleansed. Stacks.
+Ruination of the Spirit|Damage-Over-Time, Curse, Stacking|Ongoing necrotic damage until cleansed. Stacks.
+Price in Blood|Affliction, Holy, Blood, Stacking|Shared by the caster and target. Damage between them is increased (holy even more). Can't be cleansed while the other is alive.
+Sanction|Affliction, Holy|Healing, recovery and regeneration are weaker, scaling sharply with how injured the enemy is. Locked while Penance remains.
+Harbinger of Doom|Affliction, Unholy, Stacking|Drains mana to conjure butterflies that spread the victim's other non-holy afflictions to nearby enemies.
+Sin|Affliction, Curse, Stacking|All necrotic damage taken is increased. Stacks.
+Price of Absolution|Affliction, Holy|Take transcendent damage for each Sin instance cleansed.
+Wages of Sin|Affliction, Unholy, Stacking|Necrotic damage over time. Stacks.
+Legacy of Sin|Affliction, Holy, Stacking|Increases the damage scaling of execute abilities. Stacks.
+Resistant|Boon, Holy, Stacking|Increased affliction resistance. Stacks. Cancels Vulnerable one for one.
+Integrity|HoT, MoT, SoT, Holy, Stacking|Periodically recover a little health, stamina and mana. Stacks.
+Mark of Sin|Affliction, Holy|Prevents aura retraction. Locked while Sin or Legacy of Sin remains.
+Weight of Sin|Affliction, Holy|Transcendent damage whenever hit by a holy boon, recovery, healing or cleanse.
+Marshal of Judgement|Boon, Tracking, Holy|Know the distance and direction to anyone bearing your Mark of Sin.
+Mortality|Affliction, Magic|Negates immunity to curses, even for things without a soul or life. Locked while a curse remains.
+Umbral Snake Venom|Damage-Over-Time, Poison, Stacking|Ongoing necrotic damage until cleansed. Stacks.
+Corrosion|Affliction, DoT, Elemental, Stacking|Corrosive damage, more effective against inorganic things. Stacks.
+Benevolent Hegemon|Boon, Holy, Stacking|Allied auras overlapping yours are stronger. Stacks.
+Hegemon's Tribute|Affliction, Magic|A mild mana drain while in the Hegemon's aura, with a final burst if cleansed or killed.
+Guardian's Blessing (Dark Guardian)|Boon, Holy|Consumed to absorb damage; each consumed instance grants Blessing's Bounty.
+Blessing's Bounty|Heal-Over-Time, Holy, Stacking|Heal over time. Stacks.
+Hegemon's Authority|Boon, Holy, Unholy, Stacking|Allies in your aura resist aura suppression; consume instances to strengthen your own suppression.
+Vibrant Echo|Affliction, DoT, Magic, Stacking|Ongoing resonating-force damage. Stacks.
+Radiant Echo|Affliction, DoT, Magic, Stacking|Ongoing disruptive-force damage. Stacks.
+Burning|Affliction, DoT, Elemental|Ongoing fire damage.
+Momentum|Boon, Magic, Stacking|Consumed on attack for resonating-force damage. Builds while moving, drops fast when still.
+Blessing of Anticipation|Boon, Holy, Stacking|Consume instances to negate incoming damage.
+Impervious|Boon, Magic, Stacking|Higher resistances and reduction against non-physical damage. Stacks.
+Agent of Karma|Boon, Holy, Stacking|Small temporary boost to Power and Spirit. Stacks.
+Bad Karma (Karmic Warrior)|Affliction, Retributive, Holy|Small retributive transcendent damage when attacking anyone without Karmic Sacrifice.
+Good Karma (Karmic Warrior)|Boon, Holy, Stacking|Bonus to Recovery and less damage from enemies with Bad Karma.
+Karmic Sacrifice|Boon, Holy, Heal-Over-Time|Ongoing healing based on accrued Good Karma; ends if no enemy has Bad Karma.
+Guardian's Blessing (Intermittent Armour)|Boon, Holy|Small damage reduction from all sources, weaker against silver rank and up.
+Good Karma (Eye of Karma)|Boon, Holy, Stacking|Less damage from enemies with Bad Karma.
+Bad Karma (Eye of Karma)|Affliction, Holy, Retribution, Stacking|Part of the damage dealt to those with Good Karma comes back as transcendent damage, up to 100%.
+Instant Karma|Affliction, Retribution, Holy|The target takes matching retributive damage whenever it deals damage.
+Mana Imbalance|Affliction, Magic, Stacking|Mana drain is stronger against the target. Stacks.
+Spell Impetus|Affliction, Magic, Stacking|Resistances reduced; consumed to boost a spell from the Spell Lance of the Magister wielder.
+Power of the War Magus|Boon, Magic, Stacking|A body-hugging barrier; consumed to increase force-bolt damage.
+Mana Siphon|Affliction, Magic|Mana drain is stronger against the target.
+Slow Learner|Affliction, Curse|Increases all retributive damage the target suffers.
+Priority Ward|Boon, Magic, Stacking|Reduces Absorbing Shield's cooldown by one second per instance.
+Death's Grip|Affliction, Unholy|Healing is reduced, more so with each necrotic hit.
+Stunned|Affliction, Lightning|Briefly unable to take physical action.
+Relentless Attack|Boon, Magic, Stacking|Consume to cut a special attack's cooldown, more so for movement attacks.
+Dark Descent|Affliction, Magic, Stacking|Smaller perception range and weaker perception and affliction resistance. Stacks.
+Wounding (type)|Affliction type|Removed by healing rather than cleansing. Easier to remove, but it soaks up healing. Wounding effects don't stack.
+Cauterised|Affliction, Wounding, Elemental|Fire-based wounding that soaks up even more healing than Bleeding. Doesn't stop Bleeding.
+Courage|Boon, Holy, Stacking|Negates the next significant hit or affliction, including whole multi-effect attacks.
+Minor Stun|Affliction, Magic|Loss of function in the struck area; disorienting on vital areas.
+Purifying Flame|Affliction, Wounding, Fire, Holy, Dispel|Ongoing fire damage that periodically strips a magic, elemental or unholy boon.
+Inexorable Purgation|Affliction, Holy, Stacking|Makes Purifying Flame harder to resist; can't itself be resisted.
+Blinding Light|Affliction|From the Messengers. Details unknown.
+Flash Blindness|Affliction|Blinds the target. From a Purity loyalist.
+Inescapable Chains|Affliction|Consumed to apply Inescapable, ignoring resistance. From a Purity loyalist's item.
+Muscle Paralysis|Affliction|From the arc rifle Jason found in Genesis space.
+Burning Eye of the Sun|Affliction|Inflicted by some of Rufus' abilities.
+Pale Eye of the Moon|Affliction|Inflicted by some of Rufus' abilities.
+Paralysis Venom|Affliction|Inflicted by the Aranean Arch (one of Dawn's abilities).`;
+
+// Items: name|rank, rarity|type|source|summary
+const ITEM_RAW = `World-Phoenix Token|transcendent, legendary|consumable|Jason, on becoming an outworlder|Unknown effect.
+Healing Unguent|iron, common|consumable, healing|Looted from a Potent Hamster|Topical healing for superficial injuries; weaker on bronze rank and up. 5 uses.
+Monster Core (Lesser)|iron, common|crafting material|Looting powers or rituals|A small red-brown teardrop gem used in rituals and magic items.
+Lesser Spirit Coin|iron, common|currency, crafting material|Looting powers or rituals|Washed-out blue, glass-like. Fuels lesser magic items or rituals.
+Trowel of the Blood Cult|iron, uncommon|tool|Looted from a Carnivorous Mandrake|Improves the health of carnivorous plants.
+Crude Magic Lamp|iron, common|tool|Tunnels under the Blood Cult manor|Casts light; charged with Lesser Spirit Coins.
+Seal Knife|bronze, common|weapon, tool|Landemere Vane|Letters sealed with it are destroyed if opened by anyone but the addressee.
+Recovery Potion|bronze, rare|consumable, healing|Landemere Vane|Strong healing and mana recovery; weaker on silver rank and up.
+Robes of the Astral Verdict|bronze, rare|armour, cloth|Landemere Vane|Boosts dimension spell damage, gives summons damage reduction, resists disruptive force.
+Landemere Vane's Key Ring|normal, common|tool|Landemere Vane|Keys to locks throughout Vane Manor, some magical.
+Astral Magic II|bronze, uncommon|skill book|Landemere Vane|Teaches intermediate astral magic theory.
+Ritual Magic I|iron, common|skill book|Landemere Vane|Teaches basic ritual magic theory.
+Night-Scale Leather|bronze, uncommon|crafting material|Looted from an Umbral Mountain Snake|Snake skin for clothing, armour and accessories.
+Night Fang|iron, epic|weapon, knife|Looted from an Umbral Mountain Snake|Inflicts Umbral Snake Venom; ignores bronze-rank damage reduction and poison resistance.
+Silver Spirit Coin|silver, common|currency, crafting material|Looting powers or rituals|Fuels silver items; consume to briefly raise all attributes to silver rank.
+Shell-Skin Potion|iron, uncommon|consumable|Looted from a Shab|Hardens skin against physical attacks for 10 minutes at the cost of Speed.
+Oasis Bracelet|iron, uncommon|accessory|Jason's quest reward for defending a town from Shabs|Keeps the wearer cool and reduces fire and heat damage; recharged with water quintessence.
+Way of the Reaper: Five Forms I|iron, legendary|skill book|Gift from Rufus|Teaches the iron-rank techniques of all five Reaper forms.
+Dread Salvation|iron/bronze, legendary (growth)|weapon, sword|Forged by Gary for Jason|Gains Stone Cutter or Spell Breaker stacks when an affliction meets physical or magical immunity; at bronze it also inflicts Vibrant or Radiant Echo.
+Trap Weaver Battle Robe|iron, epic|armour|Crafted by Gilbert|Strong against cutting and piercing, self-repairs, hides blood trails, resists bleeds, poison and adhesives.
+Dimensional Bag|iron, rare|container|Bought from Filbert|Extra-dimensional storage; adds eight inventory spaces.
+Sand-Cutter Boots|iron, rare|boots|Bought from Filbert|Walk on sand, jump higher, and a strong kick against earth-affinity enemies.
+Stonebreaker Hammer|iron, common|tool|Brought to the Marsh Hydra's lair|Gets heavier the stronger the wielder.
+Soul-Purgation Tablet (aura)|transcendent, legendary|consumable|Provided by Knowledge|Removes an existing aura ability.
+Shimmer Beet Rum|bronze, common|consumable|Norwich Distillery, Greenstone|Inflicts Alcohol. Drinking it apparently counts as a special attack.
+Clockwork Core|iron, rare|crafting material|Clockwork Kings|Simplifies building a construct creature.
+Amulet of Intermittent Armour|bronze, uncommon|necklace|Looted from a Builder cultist|Slowly builds Guardian's Blessing for small damage reduction.
+Star Seed (Builder)|unknown|unknown|Looted from a Builder cultist|Unknown.
+Necklace of the Deep|iron, uncommon|necklace|Looted from a Tidal Troll|Ignore pressure and breathe water, but you're heavier.
+Medallion of Escape|silver, uncommon|consumable|Shade, Reaper trials|Instantly leave the astral space; only in the City of Fallen Echoes.
+Lesser Mirable Potion|iron, legendary|potion|Shade, Reaper trials|Fully restores health, mana and stamina for normal and iron rank.
+Siege Grips|bronze, rare|gloves|Looted from a Siege Golem (for Sophie)|Explosive knock-back punches, plus a conjured flying ram.
+Meteor Hammer|bronze, uncommon|weapon, chain|Looted from a Siege Golem|More resonating-force damage the longer it swings; chain length adjusts.
+Spell Lance of the Magister|iron, legendary (growth)|weapon, staff|Found by Clive in the Reaper's astral space|Disruptive-force bolts and beams that apply Spell Impetus to empower spells.
+Magister's Tithe|iron, legendary (growth)|weapon, wand|Found by Clive in the Reaper's astral space|Disruptive beam with Mana Siphon, and a mana-draining beam.
+Sentinel's Orb|iron, legendary (growth)|tool, orb|Found by Clive in the Reaper's astral space|Stronger shield abilities with shorter cooldowns.
+Sentinel's Crown|iron, legendary (growth)|circlet|Found by Clive in the Reaper's astral space|More mana recovery and cheaper shield abilities.
+Ritualist's Umbrella|iron, epic|tool|Reaper trials reward|Floats after you, repels liquid, and harmonises magic to ease rituals.
+True Light|diamond, rare|consumable|Reaper trials reward|Releases the true light of the sun.
+Summoner's Die: Form|iron/bronze, legendary (growth)|tool, die|Reaper trials reward|A d12 that randomly alters a summon's form.
+Immortal Crest|iron, rare|consumable, tattoo|Reaper trials reward|A mystical tattooist uses it to draw out a soul crest.
+Scythe of the Reaper|diamond, legendary|tool, scythe|Claimed by Jason in the Reaper trials|The symbolic legacy of the Order of the Reaper.
+Reaper Token|transcendent, legendary|consumable|Reaper trials reward|Astral Blessing Token: can trigger racial gift evolutions or specific powers.
+Cloud Flask|iron/bronze, legendary (growth)|tool|Gift from Emir|Soul-bound. Creates cloud houses (and carriage houses at bronze) with stored space.
+Amulet of the Dark Guardian|iron, legendary (growth)|necklace|Quest reward against the Oasis Tyrant|Each affliction you apply grants Guardian's Blessing, which you can pass on by touch.
+Dark Hydra Robe|bronze, epic|armour|Crafted by Gilbert|Tough, rapidly self-repairing robe that boosts heal-over-time and poison resistance; conjured weapons inflict Umbral Snake Venom.
+Flail of the Hydra|bronze, rare|weapon, whip|Looted from the Marsh Hydra|Five biting heads that seek out enemies; stronger poison.
+Orb of Ascension (Silver)|silver, legendary|consumable|Reaper's astral space|Lets one epic or legendary bronze item be ascended in rank.
+Practise Sword|bronze, common|weapon, sword|Asano Village|Replaces damage with a sting and a Minor Stun, for safe sparring.`;
+
+</script>
+<script>
+(function(){
+const RN={C:'Common',U:'Uncommon',R:'Rare',E:'Epic',L:'Legendary','?':'Unknown'};
+const RO=['C','U','R','E','L','?'];
+const rc=r=>'r-'+(r==='?'?'Q':r);
+const CATN={A:'Animal',W:'Weapon',T:'Tool',E:'Elemental',M:'Modifier',B:'Body',O:'Other',C:'Confluence'};
+const SCATO=['A','W','T','E','M','B','C','O'];
+const CATO=['A','W','T','E','M','B','O'];
+const ATTRS=['Power','Speed','Spirit','Recovery'];const SLOTL=['Essence 1','Essence 2','Essence 3','Confluence'];
+const KEY='hwfwm-essence-randomizer-v1';
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const DEF={essR:{C:true,U:true,R:true,E:true,L:true,'?':false},cat:{A:'allow',W:'allow',T:'allow',E:'allow',M:'allow',B:'allow',O:'allow'},confirmedOnly:false,restricted:false,shuffle:true,race:false,stoneR:{C:true,U:true,R:true,E:true,L:true,'?':true},scat:{A:'allow',W:'allow',T:'allow',E:'allow',M:'allow',B:'allow',C:'allow',O:'allow'},stoneConfirmed:false,jokes:false};
+const clone=o=>JSON.parse(JSON.stringify(o));
+let S=Object.assign(clone(DEF),store.get(KEY+':settings',{}));
+for(const k of ['essR','cat','stoneR','scat'])S[k]=Object.assign({},DEF[k],S[k]||{});
+let CUSTOM=store.get(KEY+':custom',[]);
+let HIST=store.get(KEY+':history',[]);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const keyOf=a=>a.slice().sort().join(' ');
+
+/* ---------- data ---------- */
+let ESS={},STONES={};const COMBOS=[],BYKEY={};
+COMBO_RAW.split('\n').forEach(l=>{const i=l.indexOf('|');const [es,c]=l.slice(0,i).split('>');const e=es.split(' ').sort();const k=e.join(' ');
+  const cb={e,c,note:l.slice(i+1),k};cb.restr=e.some(x=>RESTRICTED_ESS.includes(x))||RESTRICTED_CONF.includes(c)||RESTRICTED_EXTRA.includes(k);
+  COMBOS.push(cb);(BYKEY[k]=BYKEY[k]||[]).push(cb)});
+function buildData(){
+  ESS={};
+  ESS_RAW.split('\n').forEach(l=>{const [n,r,c]=l.split('|');ESS[n]={n,r,cats:c?c.split(''):['O'],custom:false}});
+  CUSTOM.forEach(x=>{if(!ESS[x.n])ESS[x.n]={n:x.n,r:x.r,cats:[x.c],custom:true}});
+  STONES={};
+  STONE_RAW.split('\n').forEach(l=>{const a=l.indexOf('|'),b=l.indexOf('|',a+1);const n=l.slice(0,a);STONES[n]={n,r:l.slice(a+1,b),note:l.slice(b+1),confirmed:true,from:null}});
+  const add=(base,kind,r)=>{const sn=STONE_RENAME[base]||base;const s=STONES[sn];
+    if(s){if(!s.from)s.from={kind,base};if(s.r==='?'&&r&&r!=='?')s.estR=r}
+    else STONES[sn]={n:sn,r:r||'?',note:'',confirmed:false,from:{kind,base}}};
+  Object.values(ESS).forEach(e=>add(e.n,'essence',e.r));
+  CONFLUENCES.forEach(c=>add(c,'confluence','?'));
+  Object.values(STONES).forEach(s=>{s.eff=s.r!=='?'?s.r:(s.estR||'?');
+    s.restr=!!s.from&&(RESTRICTED_ESS.includes(s.from.base)||RESTRICTED_CONF.includes(s.from.base));
+    s.joke=JOKE_STONES.includes(s.n)});
+}
+buildData();
+const noteOf=n=>{let t=ESS_NOTE[n]||'';if(t.startsWith('@'))t=SHARED[t.slice(1)];return t};
+const isConf=n=>CONFLUENCES.includes(n);
+
+/* ---------- rules ---------- */
+function essOk(e){if(!e||!S.essR[e.r])return false;if(!S.restricted&&RESTRICTED_ESS.includes(e.n))return false;if(e.cats.some(c=>S.cat[c]==='never'))return false;return true}
+const reqCats=()=>CATO.filter(c=>S.cat[c]==='require');
+const meets=names=>reqCats().every(c=>names.some(n=>ESS[n]&&ESS[n].cats.includes(c)));
+function comboOk(names){if(S.restricted)return true;if(names.some(n=>RESTRICTED_ESS.includes(n)))return false;const cbs=BYKEY[keyOf(names)];return !(cbs&&cbs.some(c=>c.restr))}
+const confsFor=names=>BYKEY[keyOf(names)]||[];
+const names=()=>B.slots.map(s=>s.n);
+function stoneCats(n){const s=STONES[n];if(!s||!s.from)return ['O'];if(s.from.kind==='confluence')return ['C'];const e=ESS[s.from.base];return e?e.cats:['O']}
+function stonePool(){return Object.values(STONES).filter(s=>S.stoneR[s.eff]&&(!S.stoneConfirmed||s.confirmed)&&(S.jokes||!s.joke)&&(S.restricted||!s.restr)&&!stoneCats(s.n).some(c=>S.scat[c]==='never')).map(s=>s.n)}
+
+/* ---------- rolling ---------- */
+let B=null;
+function rollNames(locks){
+  const lockedNames=locks.filter(Boolean);
+  if(reqCats().length>3){toast('You can require at most three categories.');return null}
+  if(S.confirmedOnly){
+    const cands=COMBOS.filter(cb=>cb.e.every(n=>ESS[n]&&(essOk(ESS[n])||lockedNames.includes(n)))&&lockedNames.every(n=>cb.e.includes(n))&&meets(cb.e)&&(S.restricted||!cb.restr));
+    if(cands.length){const cb=pick(cands);const rest=shuffle(cb.e.filter(n=>!lockedNames.includes(n)));return locks.map(l=>l||rest.shift())}
+    toast('No confirmed confluence fits these settings, so this was a free roll.');
+  }
+  const free=Object.values(ESS).filter(essOk).map(e=>e.n).filter(n=>!lockedNames.includes(n));
+  const need=locks.filter(l=>!l).length;
+  if(free.length<need){toast('Not enough essences match your settings. Turn on more rarities or categories.');return null}
+  for(let t=0;t<4000;t++){const p=shuffle(free.slice()).slice(0,need);const out=locks.map(l=>l||p.shift());if(meets(out)&&comboOk(out))return out}
+  toast('No build meets every category rule. Try loosening them.');return null;
+}
+function rollAll(){
+  const locks=B?B.slots.map(s=>s.lock?s.n:null):[null,null,null];
+  const ns=rollNames(locks);if(!ns)return;
+  const raceKeep=B&&B.race;
+  const old=B;
+  B={slots:ns.map((n,i)=>({n,lock:!!locks[i]})),attr:S.shuffle?shuffle(ATTRS.slice()):ATTRS.slice(),stones:[0,1,2,3].map(i=>[0,1,2,3].map(k=>old&&isSL(old,i,k)?old.stones[i][k]:'')),slock:old&&old.slock?old.slock.map(a=>a.slice()):SL0(),race:S.race?pick(RACES)[0]:null};
+  rollStones([0,1,2,3]);pushHist();render([0,1,2,3]);
+}
+const SL0=()=>[0,1,2,3].map(()=>[false,false,false,false]);
+const isSL=(b,i,k)=>!!(b&&b.slock&&b.slock[i]&&b.slock[i][k]);
+function rollStones(idxs){const pos=[];idxs.forEach(i=>[0,1,2,3].forEach(k=>{if(!isSL(B,i,k))pos.push([i,k])}));rollStonePos(pos)}
+function rollStonePos(pos){
+  if(!B.slock)B.slock=SL0();
+  B.stones=B.stones.map(a=>[0,1,2,3].map(k=>a[k]||''));
+  const key=p=>p[0]+':'+p[1];const ps=new Set(pos.map(key));
+  const used=new Set();B.stones.forEach((a,i)=>a.forEach((x,k)=>{if(x&&!ps.has(i+':'+k))used.add(x)}));
+  const pool=stonePool();const avail=shuffle(pool.filter(n=>!used.has(n)));
+  pos.forEach(([i,k])=>{B.stones[i][k]=avail.shift()||''});
+  const req=SCATO.filter(c=>S.scat[c]==='require');let miss=[];
+  req.forEach(c=>{const all=B.stones.flat().filter(Boolean);if(all.some(n=>stoneCats(n).includes(c)))return;
+    const cand=avail.findIndex(n=>stoneCats(n).includes(c));
+    if(cand<0||!pos.length){miss.push(CATN[c]);return}
+    const free=pos.filter(([i,k])=>!req.some(r=>r!==c&&stoneCats(B.stones[i][k]).includes(r)));const p=pick(free.length?free:pos);
+    B.stones[p[0]][p[1]]=avail.splice(cand,1)[0]});
+  if(B.stones.some(a=>a.some(x=>!x)))toast('Not enough awakening stones match your stone settings to fill every slot.');
+  else if(miss.length)toast('Couldn\'t fit a required '+miss.join(' or ')+' stone. Unlock a stone or loosen your settings.');
+}
+function rerollStone(i,k){if(isSL(B,i,k))return;rollStonePos([[i,k]]);pushHist();render()}
+function confName(){const c=confsFor(names());return c.length?c[0].c:''}
+function rerollSlot(i){
+  const others=names().filter((_,j)=>j!==i);const cur=B.slots[i].n;let choices=[];
+  if(S.confirmedOnly){
+    choices=COMBOS.filter(cb=>others.every(n=>cb.e.includes(n))&&(S.restricted||!cb.restr)).map(cb=>cb.e.find(n=>!others.includes(n))).filter(n=>n!==cur&&essOk(ESS[n]));
+    if(!choices.length)toast('No confirmed confluence pairs '+others.join(' and ')+' with an allowed third essence, so this was a free roll.');
+  }
+  if(!choices.length){choices=Object.values(ESS).filter(essOk).map(e=>e.n).filter(n=>n!==cur&&!others.includes(n)).filter(n=>{const t=others.slice();t.splice(i,0,n);return meets(t)&&comboOk(t)})}
+  if(!choices.length){toast('Nothing else fits this slot with your settings.');return}
+  const before=confName();B.slots[i].n=pick(choices);
+  const idx=[i];if(confName()!==before)idx.push(3);
+  rollStones(idx);pushHist();render(idx);
+}
+function swapIn(outN,inN){
+  const i=names().indexOf(outN);if(i<0)return;
+  B.slots[i].n=inN;rollStones([i,3]);pushHist();render([i,3]);
+  $('build').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+}
+
+/* ---------- history ---------- */
+function pushHist(){HIST.unshift({s:names(),a:B.attr.slice(),st:B.stones.map(x=>x.slice()),r:B.race});HIST=HIST.slice(0,12);store.set(KEY+':history',HIST);renderHist()}
+function restore(h){
+  if(!h.s.every(n=>ESS[n]))return false;
+  B={slots:h.s.map(n=>({n,lock:false})),attr:h.a,stones:h.st.map(a=>a.slice()),slock:SL0(),race:h.r||null};
+  const bad=[0,1,2,3].filter(i=>B.stones[i].some(n=>!STONES[n]));if(bad.length)rollStones(bad);return true;
+}
+function renderHist(){
+  const el=$('hist');
+  el.innerHTML=HIST.slice(1).map((h,i)=>{const c=(confsFor(h.s)[0]||{}).c;return `<button type="button" data-h="${i+1}">${esc(h.s.join(' · '))} → ${c?esc(c):'?'}</button>`}).join('')||'<span class="empty">Your last dozen rolls show up here.</span>';
+}
+
+/* ---------- render ---------- */
+const ICON={
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+ unlock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>',
+ dice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>'
+};
+function stoneItem(n,i,k){const s=STONES[n];const lk=isSL(B,i,k);
+  const tools=`<button type="button" class="icon" data-slock="${i}:${k}" aria-pressed="${lk}" title="${lk?'Unlock':'Lock'} this stone" aria-label="${lk?'Unlock':'Lock'} ${esc(n||'stone')}">${lk?ICON.lock:ICON.unlock}</button><button type="button" class="icon" data-sroll="${i}:${k}" ${lk?'disabled':''} title="Reroll this stone" aria-label="Reroll ${esc(n||'stone')}">${ICON.dice}</button>`;
+  if(!s)return `<li class="srow"><span class="stone"><span class="sn from">Empty</span></span>${tools}</li>`;
+  const tag=s.confirmed?'':'<span class="tag">Unconfirmed</span>';
+  return `<li class="srow${lk?' locked':''}"><button type="button" class="stone ${rc(s.eff)}${s.confirmed?'':' unconf'}" data-info="s:${esc(n)}"><span class="marble" aria-hidden="true"></span><span class="sn">${esc(n)}</span>${tag}</button>${tools}</li>`}
+function stonesBlock(i){return `<p class="stones-h">Awakening stones</p><ol class="stones">${[0,1,2,3].map(k=>stoneItem(B.stones[i][k],i,k)).join('')}</ol>`}
+function essCard(i,anim){
+  const s=B.slots[i],e=ESS[s.n];const restr=RESTRICTED_ESS.includes(e.n);
+  return `<article class="card${anim?' pop':''}">
+   <div class="attr"><span>${SLOTL[i]}</span><span class="tools">
+     <button type="button" class="icon" data-lock="${i}" aria-pressed="${s.lock}" title="${s.lock?'Unlock':'Lock'} this essence" aria-label="${s.lock?'Unlock':'Lock'} ${esc(e.n)}">${s.lock?ICON.lock:ICON.unlock}</button>
+     <button type="button" class="icon" data-reroll="${i}" ${s.lock?'disabled':''} title="Reroll this essence" aria-label="Reroll ${esc(e.n)}">${ICON.dice}</button></span></div>
+   <div class="head ${rc(e.r)}"><button type="button" class="cube" data-info="e:${esc(e.n)}" aria-label="About ${esc(e.n)}">${esc(e.n[0])}</button>
+     <div style="min-width:0"><button type="button" class="name" data-info="e:${esc(e.n)}">${esc(e.n)}</button>
+     <div class="meta"><span class="chip">${RN[e.r]}</span><span>${e.cats.map(c=>CATN[c]).join(' / ')}${e.custom?' · yours':''}</span>${restr?'<span class="flag">Restricted</span>':''}</div></div></div>
+   ${descBtn(e.n)}
+   ${stonesBlock(i)}</article>`}
+function descBtn(n){const t=noteOf(n);const k=COMBOS.filter(c=>c.e.includes(n)).length;
+  if(!t)return `<button type="button" class="desc none" data-info="e:${esc(n)}">No description on the Essence list yet.<span class="more">See ${k} known combo${k===1?'':'s'}</span></button>`;
+  return `<button type="button" class="desc" data-info="e:${esc(n)}"><span class="txt">${esc(t)}</span><span class="more">Full description and ${k} known combo${k===1?'':'s'}</span></button>`}
+function confCard(anim){
+  const cbs=confsFor(names());
+  if(!cbs.length)return `<article class="card conf${anim?' pop':''}">
+   <div class="attr"><span>Confluence</span></div>
+   <div class="head"><span class="cube unknown" aria-hidden="true">?</span><div style="min-width:0"><div class="name" style="text-decoration:none">Unknown Confluence</div></div></div>
+   ${stonesBlock(3)}</article>`;
+  const cb=cbs[0];
+  return `<article class="card conf${anim?' pop':''}">
+   <div class="attr"><span>Confluence</span></div>
+   <div class="head r-Q"><button type="button" class="cube" style="--rx:var(--accent)" data-info="c:${esc(cb.c)}" aria-label="About ${esc(cb.c)}">${esc(cb.c[0])}</button>
+   <div style="min-width:0"><button type="button" class="name" data-info="c:${esc(cb.c)}">${esc(cb.c)}</button>
+   <div class="meta"><span class="from">from ${cb.e.map(esc).join(' + ')}</span>${cb.restr?'<span class="flag">Restricted</span>':''}</div></div></div>
+   ${cb.note?`<p class="cnote">${esc(cb.note)}</p>`:''}
+   ${CONF_NOTE[cb.c]?`<button type="button" class="desc" data-info="c:${esc(cb.c)}"><span class="txt">${esc(CONF_NOTE[cb.c])}</span><span class="more">Full description and every combo for ${esc(cb.c)}</span></button>`:''}
+   ${cbs.length>1?`<p class="from">Also listed as ${cbs.slice(1).map(x=>esc(x.c)).join(', ')}.</p>`:''}
+   ${stonesBlock(3)}</article>`}
+function render(anim){
+  anim=anim||[];
+  $('build').innerHTML=[0,1,2].map(i=>essCard(i,anim.includes(i))).join('')+confCard(anim.includes(3));
+  const rl=$('raceLine');
+  if(B.race){const r=RACES.find(x=>x[0]===B.race);rl.hidden=false;rl.innerHTML=`<span>Race</span><b>${esc(B.race)}</b><span>${esc(r?r[1]:'')}</span>`}else rl.hidden=true;
+  renderNear();
+}
+function renderNear(){
+  const ns=names();const known=confsFor(ns).length>0;const out=[];
+  COMBOS.forEach(cb=>{const sh=cb.e.filter(n=>ns.includes(n));if(sh.length!==2)return;if(!S.restricted&&cb.restr)return;
+    out.push({out:ns.find(n=>!cb.e.includes(n)),in:cb.e.find(n=>!ns.includes(n)),c:cb.c})});
+  out.sort((a,b)=>a.c.localeCompare(b.c)||a.in.localeCompare(b.in));
+  $('nearTitle').textContent=known?'Other known combos nearby':'Close known combos';
+  $('nearLead').textContent=out.length?(known?'Each of these shares two of your essences. Tap one to swap it in.':'Each of these shares two of your essences and makes a confirmed confluence. Tap one to swap it in.'):'';
+  $('near').innerHTML=out.slice(0,12).map(o=>{const e=ESS[o.in];const off=e&&!essOk(e);
+    return `<button type="button" class="swap ${rc(e?e.r:'?')}" data-swap="${esc(o.out)}|${esc(o.in)}"><span>Swap ${esc(o.out)}</span><span class="arrow">→</span><span class="to">${esc(o.in)}</span><span class="cf">${esc(o.c)}</span>${off?'<span class="off">Outside your current filters</span>':''}</button>`}).join('')
+    ||'<p class="empty">None of the known combos share two of these essences.</p>';
+}
+
+/* ---------- info dialog ---------- */
+function comboLi(cb){return `<li><b>${cb.e.map(esc).join(' + ')}</b> → <b>${esc(cb.c)}</b>${cb.restr?' <span class="flag">restricted</span>':''}${cb.note?`<small>${esc(cb.note)}</small>`:''}</li>`}
+function openInfo(spec){
+  const t=spec[0],n=spec.slice(2);let h='';
+  if(t==='e'){const e=ESS[n];const cbs=COMBOS.filter(c=>c.e.includes(n));const st=STONES[STONE_RENAME[n]||n];
+    h=`<div class="kind">Essence · ${e.cats.map(c=>CATN[c]).join(' / ')}</div><h2 id="dlgTitle">${esc(n)}</h2>
+    <div class="meta ${rc(e.r)}"><span class="chip">${RN[e.r]}</span>${RESTRICTED_ESS.includes(n)?'<span class="flag">Restricted essence</span>':''}${e.custom?'<span>Added by you</span>':''}</div>
+    ${noteOf(n)?`<p>${esc(noteOf(n))}</p>`:'<p class="from">No notes for this essence yet.</p>'}
+    ${st?`<p class="from">Matching stone: ${esc(st.n)} (${st.confirmed?'confirmed':'unconfirmed'}).</p>`:''}
+    <h3>Known combos (${cbs.length})</h3>${cbs.length?`<ul class="clist">${cbs.map(comboLi).join('')}</ul>`:'<p class="from">Not in any confirmed combo yet.</p>'}`}
+  else if(t==='c'){const cbs=COMBOS.filter(c=>c.c===n);
+    h=`<div class="kind">Confluence essence</div><h2 id="dlgTitle">${esc(n)}</h2>
+    ${RESTRICTED_CONF.includes(n)?'<div class="meta"><span class="flag">Restricted confluence</span></div>':''}
+    ${CONF_NOTE[n]?`<p>${esc(CONF_NOTE[n])}</p>`:''}
+    <h3>Combos that make it (${cbs.length})</h3><ul class="clist">${cbs.map(comboLi).join('')}</ul>`}
+  else if(t==='s'){const s=STONES[n];
+    const rl=s.r!=='?'?RN[s.r]:(s.estR?`Unknown (the ${esc(s.from.base)} essence is ${RN[s.estR]})`:'Unknown');
+    const src=s.from?`Matches the ${esc(s.from.base)} ${s.from.kind}.`:'A stone with no matching essence.';
+    h=`<div class="kind">Awakening stone</div><h2 id="dlgTitle">Awakening Stone of ${esc(n)}</h2>
+    <div class="meta ${rc(s.eff)}"><span class="chip">${RN[s.eff]}${(!s.confirmed||s.r==='?')&&s.eff!=='?'?' (from essence)':''}</span>${s.restr?'<span class="flag">Restricted</span>':''}${s.joke?'<span>Joke stone</span>':''}</div>
+    <p>${s.confirmed?'Confirmed in the books or by Shirtaloon.':'Unconfirmed: most essences and confluences have a matching stone, but this one hasn\'t been seen yet. Its rarity is a guess based on the essence.'} ${src}</p>
+    ${s.confirmed?`<p class="from">Rarity: ${rl}.</p>`:''}
+    ${s.note?`<p>${esc(s.note)}</p>`:''}
+    <p class="from">Awakening stones are smooth, fist-sized marbles of various colours and designs.</p>`}
+  showDlg(h);
+}
+function showDlg(inner){
+  $('dlgBody').innerHTML=`<div class="dlg-top"><div style="min-width:0">${inner.split('</h2>')[0]}</h2></div><button type="button" class="btn" data-close style="padding:6px 12px">Close</button></div>${inner.split('</h2>').slice(1).join('</h2>')}`;
+  const d=$('dlg');if(d.showModal){try{d.showModal()}catch(e){d.setAttribute('open','')}}else d.setAttribute('open','');
+  d.scrollTop=0;
+}
+$('dlg').addEventListener('click',e=>{if(e.target.id==='dlg'||e.target.closest('[data-close]'))$('dlg').close()});
+
+/* ---------- copy ---------- */
+function buildText(){
+  const cb=confsFor(names())[0];const lines=['HWFWM Essences build'];
+  if(B.race)lines.push('Race: '+B.race);
+  B.slots.forEach((s,i)=>lines.push(`${SLOTL[i]}: ${s.n} (${RN[ESS[s.n].r]}). Stones: ${B.stones[i].join(', ')}`));
+  lines.push(`Confluence: ${cb?cb.c:'Unknown Confluence'}. Stones: ${B.stones[3].join(', ')}`);
+  if(cb)lines.push(`(${cb.e.join(' + ')} = ${cb.c})`);
+  return lines.join('\n');
+}
+$('copyBtn').addEventListener('click',()=>{
+  const txt=buildText();
+  const fallback=()=>{showDlg(`<div class="kind">Copy build</div><h2 id="dlgTitle">Copy this text</h2><p class="from">Your browser blocked automatic copying here. The text is selected; press Ctrl+C (or long-press and Copy).</p><textarea id="copyTa" readonly>${esc(txt)}</textarea>`);const ta=$('copyTa');ta.focus();ta.select()};
+  try{navigator.clipboard.writeText(txt).then(()=>toast('Build copied. Paste it into Discord or your notes.'),fallback)}catch(e){fallback()}
+});
+
+/* ---------- toast ---------- */
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,3800)}
+
+/* ---------- events ---------- */
+$('rollBtn').addEventListener('click',rollAll);
+$('setBtn').addEventListener('click',()=>{const d=$('settings');d.open=true;d.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})});
+$('stonesBtn').addEventListener('click',()=>{rollStones([0,1,2,3]);pushHist();render([0,1,2,3])});
+$('build').addEventListener('click',e=>{
+  const l=e.target.closest('[data-lock]');if(l){const i=+l.dataset.lock;B.slots[i].lock=!B.slots[i].lock;render();return}
+  const r=e.target.closest('[data-reroll]');if(r){rerollSlot(+r.dataset.reroll);return}
+  const sl=e.target.closest('[data-slock]');if(sl){const [i,k]=sl.dataset.slock.split(':').map(Number);if(!B.slock)B.slock=SL0();B.slock[i][k]=!B.slock[i][k];render();return}
+  const sr=e.target.closest('[data-sroll]');if(sr){const [i,k]=sr.dataset.sroll.split(':').map(Number);rerollStone(i,k);return}
+  const inf=e.target.closest('[data-info]');if(inf)openInfo(inf.dataset.info);
+});
+$('near').addEventListener('click',e=>{const b=e.target.closest('[data-swap]');if(b){const [o,n]=b.dataset.swap.split('|');swapIn(o,n)}});
+$('hist').addEventListener('click',e=>{const b=e.target.closest('[data-h]');if(!b)return;const h=HIST[+b.dataset.h];
+  if(restore(h)){HIST.splice(+b.dataset.h,1);HIST.unshift(h);store.set(KEY+':history',HIST);renderHist();render([0,1,2,3])}
+  else toast('That roll used an essence you have since removed.')});
+
+/* ---------- settings ---------- */
+function saveS(){store.set(KEY+':settings',S);updateCount()}
+function updateCount(){const ne=Object.values(ESS).filter(essOk).length;const ns=stonePool().length;$('poolCount').textContent=`${ne} of ${Object.keys(ESS).length} essences and ${ns} of ${Object.keys(STONES).length} stones can roll`}
+function checks(id,obj){$(id).innerHTML=RO.map(r=>`<label class="${rc(r)}"><input type="checkbox" data-r="${r}" ${obj[r]?'checked':''}><span class="marble" aria-hidden="true"></span>${RN[r]}</label>`).join('');
+  $(id).onchange=e=>{const r=e.target.dataset.r;if(r){obj[r]=e.target.checked;saveS()}}}
+function segRow(id,order,obj,attr){$(id).innerHTML=order.map(c=>`<div class="catrow"><span>${CATN[c]}</span><span class="seg" role="group" aria-label="${CATN[c]}">${['allow','never','require'].map(v=>`<button type="button" ${attr}="${c}" data-v="${v}" aria-pressed="${obj[c]===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</span></div>`).join('')}
+function renderSCats(){segRow('scats',SCATO,S.scat,'data-scat')}
+$('scats').addEventListener('click',e=>{const b=e.target.closest('[data-scat]');if(!b)return;S.scat[b.dataset.scat]=b.dataset.v;renderSCats();saveS()});
+function renderCats(){$('cats').innerHTML=CATO.map(c=>`<div class="catrow"><span>${CATN[c]}</span><span class="seg" role="group" aria-label="${CATN[c]}">${['allow','never','require'].map(v=>`<button type="button" data-cat="${c}" data-v="${v}" aria-pressed="${S.cat[c]===v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</span></div>`).join('')}
+$('cats').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;S.cat[b.dataset.cat]=b.dataset.v;renderCats();saveS()});
+function bindToggle(id,k){const el=$(id);el.checked=!!S[k];el.onchange=()=>{S[k]=el.checked;saveS();if(k==='restricted'&&B)renderNear()}}
+function renderSettings(){
+  checks('essR',S.essR);checks('stoneR',S.stoneR);renderCats();renderSCats();
+  bindToggle('optConfirmed','confirmedOnly');bindToggle('optRestricted','restricted');bindToggle('optRace','race');bindToggle('optStoneConfirmed','stoneConfirmed');bindToggle('optJokes','jokes');
+  $('addRarity').innerHTML=RO.map(r=>`<option value="${r}">${RN[r]}</option>`).join('');
+  $('addCat').innerHTML=CATO.map(c=>`<option value="${c}">${CATN[c]}</option>`).join('');
+  renderCustoms();updateCount();
+}
+function renderCustoms(){$('customs').innerHTML=CUSTOM.map((x,i)=>`<li class="${rc(x.r)}"><span class="marble" aria-hidden="true"></span>${esc(x.n)} <span class="from">${CATN[x.c]}</span><button type="button" data-del="${i}" aria-label="Remove ${esc(x.n)}">×</button></li>`).join('')}
+$('addForm').addEventListener('submit',e=>{e.preventDefault();let n=$('addName').value.trim().replace(/\s+/g,' ');
+  if(!n){toast('Type a name for the essence first.');return}
+  n=n[0].toUpperCase()+n.slice(1);
+  if(ESS[n]||isConf(n)){toast(n+' is already on the list.');return}
+  CUSTOM.push({n,r:$('addRarity').value,c:$('addCat').value});store.set(KEY+':custom',CUSTOM);buildData();renderCustoms();updateCount();$('addName').value='';toast(n+' added. It can now come up in rolls.')});
+$('customs').addEventListener('click',e=>{const b=e.target.closest('[data-del]');if(!b)return;const x=CUSTOM[+b.dataset.del];
+  if(B&&names().includes(x.n)){toast('Roll a new build first: '+x.n+' is in your current one.');return}
+  CUSTOM.splice(+b.dataset.del,1);store.set(KEY+':custom',CUSTOM);buildData();renderCustoms();updateCount()});
+$('resetBtn').addEventListener('click',()=>{S=clone(DEF);saveS();renderSettings();toast('Settings reset to the defaults.')});
+
+/* ---------- reference lists ---------- */
+const TABS=[['roll','Randomizer'],['build','Build Maker'],['essences','Essences'],['confluences','Confluences'],['combos','Combos'],['stones','Stones'],['races','Races'],['conditions','Conditions'],['items','Items']];
+let view='roll';const LF={};
+const CONDS=COND_RAW.split('\n').map(l=>{const [n,t,d]=l.split('|');return {n,t,d}});
+const ITEMS=ITEM_RAW.split('\n').map(l=>{const [n,r,t,src,d]=l.split('|');return {n,r,t,src,d}});
+const raceNames=Object.keys(RACE_INFO);
+function renderTabs(){$('tabs').innerHTML=TABS.map(([k,l])=>`<button type="button" role="tab" data-view="${k}" aria-selected="${view===k}">${l}</button>`).join('')}
+function setView(k,push){
+  if(!TABS.some(t=>t[0]===k))k='roll';view=k;renderTabs();
+  $('view-roll').hidden=k!=='roll';$('view-list').hidden=k==='roll'||k==='build';$('view-build').hidden=k!=='build';
+  if(k==='build')renderBuild();else if(k!=='roll'){$('q').value=(LF[k]&&LF[k].q)||'';renderList()}
+  if(push){try{history.replaceState(null,'','#'+k)}catch(e){}window.scrollTo(0,0)}
+}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b)setView(b.dataset.view,true)});
+const lf=()=>(LF[view]=LF[view]||{q:'',f:{}});
+$('q').addEventListener('input',()=>{lf().q=$('q').value;renderRows()});
+const LISTS={
+ essences:{t:'Essences',lead:'Every known essence. Tap one to expand its description, its known combos and its matching stone.',
+  chips:[['notes','Has a description'],...RO.map(r=>['r'+r,RN[r]])],
+  items:()=>Object.values(ESS).sort((a,b)=>a.n.localeCompare(b.n)),
+  keep:(e,f)=>(!f.notes||noteOf(e.n))&&(!RO.some(r=>f['r'+r])||f['r'+e.r]),
+  text:e=>e.n+' '+e.cats.map(c=>CATN[c]).join(' '),
+  row:e=>{const cbs=COMBOS.filter(c=>c.e.includes(e.n));const st=STONES[STONE_RENAME[e.n]||e.n];const t=noteOf(e.n);
+   return `<details class="row ${rc(e.r)}"><summary><span class="marble" aria-hidden="true"></span><span class="rn">${esc(e.n)}</span><span class="chip">${RN[e.r]}</span>${t?'<span class="badge">Description</span>':''}${RESTRICTED_ESS.includes(e.n)?'<span class="flag">Restricted</span>':''}<span class="rt">${cbs.length} combo${cbs.length===1?'':'s'}</span><span class="sub2">${e.cats.map(c=>CATN[c]).join(' / ')}${e.custom?' · added by you':''}</span></summary>
+   <div class="body">${t?`<p>${esc(t)}</p>`:'<p class="from">No description on the Essence list yet.</p>'}
+   ${cbs.length?`<ul class="clist">${cbs.map(comboLi).join('')}</ul>`:'<p class="from">Not in any confirmed combo yet.</p>'}
+   ${st?`<p class="from">Matching stone: ${esc(st.n)} (${st.confirmed?'confirmed':'unconfirmed'}).</p>`:''}
+   <button type="button" class="btn" data-use="${esc(e.n)}">Lock into a roll</button></div></details>`}},
+ confluences:{t:'Confluences',lead:'Every known confluence and the combos that make it.',
+  chips:[['notes','Has a description'],['restr','Restricted']],
+  items:()=>CONFLUENCES.slice().sort(),
+  keep:(c,f)=>(!f.notes||CONF_NOTE[c])&&(!f.restr||RESTRICTED_CONF.includes(c)||COMBOS.some(x=>x.c===c&&x.restr)),
+  text:c=>c,
+  row:c=>{const cbs=COMBOS.filter(x=>x.c===c);return `<details class="row"><summary><span class="rn">${esc(c)}</span>${CONF_NOTE[c]?'<span class="badge">Description</span>':''}${RESTRICTED_CONF.includes(c)?'<span class="flag">Restricted</span>':''}<span class="rt">${cbs.length} combo${cbs.length===1?'':'s'}</span></summary>
+   <div class="body">${CONF_NOTE[c]?`<p>${esc(CONF_NOTE[c])}</p>`:''}<ul class="clist">${cbs.map(comboLi).join('')}</ul></div></details>`}},
+ combos:{t:'Combos',lead:'Every confirmed three-essence combination and the confluence it makes. Search any essence or confluence name.',
+  chips:[['notes','Has notes'],['hideR','Hide restricted'],['onlyR','Restricted only']],
+  items:()=>COMBOS.slice().sort((a,b)=>a.c.localeCompare(b.c)||a.k.localeCompare(b.k)),
+  keep:(c,f)=>(!f.notes||c.note)&&(!f.hideR||!c.restr)&&(!f.onlyR||c.restr),
+  text:c=>c.k+' '+c.c+' '+c.note,
+  row:c=>{const sum=`<span class="rn">${c.e.map(esc).join(' + ')}</span><span class="arrow from">→</span><span class="rn" style="color:var(--accent)">${esc(c.c)}</span>${c.restr?'<span class="flag">Restricted</span>':''}`;
+   const btn=`<button type="button" class="btn" data-try="${esc(c.k)}">Roll stones for this build</button>`;
+   return `<details class="row"><summary>${sum}${c.note?'<span class="rt">notes</span>':''}</summary><div class="body">${c.note?`<p>${esc(c.note)}</p>`:''}${btn}</div></details>`}},
+ stones:{t:'Awakening stones',lead:'Confirmed stones from the books and Discord, plus unconfirmed ones that follow the rule that most essences and confluences have a matching stone.',
+  chips:[['conf','Confirmed only'],...RO.map(r=>['r'+r,RN[r]])],
+  items:()=>Object.values(STONES).sort((a,b)=>a.n.localeCompare(b.n)),
+  keep:(s,f)=>(!f.conf||s.confirmed)&&(!RO.some(r=>f['r'+r])||f['r'+s.eff]),
+  text:s=>s.n+(s.from?' '+s.from.base:''),
+  row:s=>`<details class="row ${rc(s.eff)}"><summary><span class="marble" aria-hidden="true"></span><span class="rn">${esc(s.n)}</span><span class="chip">${RN[s.eff]}</span>${s.confirmed?'':'<span class="tag stone-tag">Unconfirmed</span>'}${s.note?'<span class="badge">Notes</span>':''}${s.restr?'<span class="flag">Restricted</span>':''}${s.joke?'<span class="from">joke</span>':''}</summary>
+   <div class="body"><p>${s.confirmed?'Confirmed in the books or by Shirtaloon.':'Unconfirmed. Its rarity is a guess based on the essence.'} ${s.from?`Matches the ${esc(s.from.base)} ${s.from.kind}.`:'Has no matching essence or confluence.'}</p>${s.note?`<p>${esc(s.note)}</p>`:''}<button type="button" class="btn" data-usestone="${esc(s.n)}">Lock into a roll</button></div></details>`},
+ races:{t:'Races',lead:'Known races and their racial abilities.',chips:[],
+  items:()=>raceNames,keep:()=>true,text:n=>n+' '+RACE_INFO[n].a.map(a=>a[0]).join(' '),
+  row:n=>{const r=RACE_INFO[n];return `<details class="row"><summary><span class="rn">${esc(n)}</span><span class="sub2">${esc(r.a.map(a=>a[0]).join(', '))}</span></summary><div class="body"><p>${esc(r.d)}</p>${r.a.length?`<ul class="abil">${r.a.map(a=>`<li><b>${esc(a[0])}</b>: ${esc(a[1])}</li>`).join('')}</ul>`:''}</div></details>`}},
+ conditions:{t:'Conditions',lead:'Afflictions and boons that Jason and his team can produce or have run into.',
+  chips:[['boon','Boons'],['aff','Afflictions']],
+  items:()=>CONDS.slice().sort((a,b)=>a.n.localeCompare(b.n)),
+  keep:(c,f)=>(!f.boon&&!f.aff)||(f.boon&&/Boon/.test(c.t))||(f.aff&&/Affliction|Damage-Over-Time/.test(c.t)),
+  text:c=>c.n+' '+c.t,
+  row:c=>`<details class="row"><summary><span class="rn">${esc(c.n)}</span><span class="sub2">${esc(c.t)}</span></summary><div class="body"><p>${esc(c.d)}</p></div></details>`},
+ items:{t:'Items',lead:'Items with known descriptions from the books, summarised.',chips:[],
+  items:()=>ITEMS.slice().sort((a,b)=>a.n.localeCompare(b.n)),keep:()=>true,
+  text:i=>i.n+' '+i.t+' '+i.src,
+  row:i=>`<details class="row"><summary><span class="rn">${esc(i.n)}</span><span class="rt">${esc(i.r)}</span><span class="sub2">${esc(i.t)}</span></summary><div class="body"><p>${esc(i.d)}</p><p class="from">Source: ${esc(i.src)}</p></div></details>`}
+};
+function renderList(){
+  const L=LISTS[view];$('listTitle').textContent=L.t;$('listLead').textContent=L.lead;
+  const f=lf().f;
+  $('listChips').innerHTML=L.chips.map(([k,l])=>`<button type="button" class="fchip${k[0]==='r'&&k.length===2?' '+rc(k[1]):''}" data-f="${k}" aria-pressed="${!!f[k]}">${k[0]==='r'&&k.length===2?'<span class="marble" aria-hidden="true"></span>':''}${esc(l)}</button>`).join('');
+  renderRows();
+}
+function renderRows(){
+  const L=LISTS[view];const st=lf();const q=st.q.trim().toLowerCase();
+  const all=L.items();const shown=all.filter(x=>L.keep(x,st.f)&&(!q||L.text(x).toLowerCase().includes(q)));
+  $('listCount').textContent=shown.length===all.length?`${all.length} entries`:`Showing ${shown.length} of ${all.length}`;
+  $('rows').innerHTML=shown.map(L.row).join('')||'<p class="empty">Nothing matches. Try a different search or turn off a filter.</p>';
+}
+$('listChips').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(!b)return;const f=lf().f;f[b.dataset.f]=!f[b.dataset.f];renderList()});
+$('rows').addEventListener('click',e=>{
+  const u=e.target.closest('[data-use]');
+  if(u){const n=u.dataset.use;if(!B)rollAll();B.slots.forEach(s=>{if(s.n!==n&&!B.slots.some(x=>x.n===n))return});
+    let i=names().indexOf(n);if(i<0){i=B.slots.findIndex(s=>!s.lock);if(i<0){toast('All three slots are locked. Unlock one first.');return}B.slots[i].n=n}
+    B.slots[i].lock=true;setView('roll',true);rollAll();toast(n+' is locked in. Roll again to change the other two.');return}
+  const us=e.target.closest('[data-usestone]');
+  if(us){const n=us.dataset.usestone;if(!B)rollAll();if(!B.slock)B.slock=SL0();
+    let p=null;for(let i=0;i<4&&!p;i++)for(let k=0;k<4&&!p;k++)if(B.stones[i][k]===n)p=[i,k];
+    if(!p)for(let i=0;i<4&&!p;i++)for(let k=0;k<4&&!p;k++)if(!isSL(B,i,k))p=[i,k];
+    if(!p){toast('All 16 stones are locked. Unlock one first.');return}
+    B.stones[p[0]][p[1]]=n;B.slock[p[0]][p[1]]=true;pushHist();setView('roll',true);render([p[0]]);toast(n+' is locked into '+SLOTL[p[0]]+'. Roll again to change the rest.');return}
+  const t=e.target.closest('[data-try]');
+  if(t){const e3=t.dataset.try.split(' ');B={slots:e3.map(n=>({n,lock:false})),attr:S.shuffle?shuffle(ATTRS.slice()):ATTRS.slice(),stones:[[],[],[],[]],race:S.race?pick(RACES)[0]:null};
+    rollStones([0,1,2,3]);pushHist();setView('roll',true);render([0,1,2,3])}
+});
+
+/* ---------- build maker ---------- */
+const BKEY=KEY+':builds';
+const RANKS=['Iron','Bronze','Silver','Gold','Diamond'];
+const EFF=[['I','Iron'],['B','Bronze'],['S','Silver'],['G','Gold'],['D','Diamond']];
+const SLOTN=['Essence 1','Essence 2','Essence 3','Confluence'];
+const blankAb=j=>({name:'',locked:j>0,stone:'',ord:'',type:'',cost:'',cd:'',inc:'',eff:{I:'',B:'',S:'',G:'',D:''}});
+const newBuild=()=>({name:'',race:'',rank:'Iron',slots:[0,1,2,3].map(()=>({n:'',attr:'',ord:'',auto:false,ab:[0,1,2,3,4].map(blankAb)})),gifts:[],inv:'',t:Date.now()});
+function normBuild(o){
+  if(!o||!Array.isArray(o.slots)||o.slots.length!==4)throw new Error('not a build');
+  const n=newBuild();['name','race','rank','inv'].forEach(k=>{n[k]=typeof o[k]==='string'?o[k]:n[k]});
+  o.slots.forEach((s,i)=>{const t=n.slots[i];['n','attr','ord'].forEach(k=>{if(s&&s[k]!=null)t[k]=String(s[k])});t.auto=!!(s&&s.auto);
+    (s&&Array.isArray(s.ab)?s.ab:[]).slice(0,5).forEach((a,j)=>{const d=t.ab[j];if(!a)return;
+      ['name','stone','ord','type','cost','cd','inc'].forEach(k=>{if(a[k]!=null)d[k]=String(a[k])});d.locked=!!a.locked;
+      if(a.eff)EFF.forEach(([k])=>{if(a.eff[k]!=null)d.eff[k]=String(a.eff[k])})})});
+  if(!RANKS.includes(n.rank))n.rank='Iron';
+  n.gifts=Array.isArray(o.gifts)?o.gifts.filter(Boolean).map(g=>({name:String(g.name||''),desc:String(g.desc||'')})):[];
+  return n;
+}
+let BL=store.get(BKEY,null);
+try{if(!BL||!Array.isArray(BL.list)||!BL.list.length)throw 0;BL.list=BL.list.map(normBuild);BL.cur=Math.min(+BL.cur||0,BL.list.length-1)}catch(e){BL={cur:0,list:[newBuild()]}}
+let canSave=true;try{localStorage.setItem(KEY+':t','1');localStorage.removeItem(KEY+':t')}catch(e){canSave=false}
+const CB=()=>BL.list[BL.cur]||BL.list[0];
+let saveT;function saveB(){clearTimeout(saveT);saveT=setTimeout(()=>{store.set(BKEY,BL);refreshCode()},300)}
+function setP(o,p,v){const ks=p.split('.');const last=ks.pop();const t=ks.reduce((a,k)=>a[k],o);t[last]=v}
+const findKey=(obj,n)=>{n=String(n||'').trim().toLowerCase();return n?Object.keys(obj).find(k=>k.toLowerCase()===n)||'':''};
+function stoneRc(n){const k=findKey(STONES,n);return k?rc(STONES[k].eff):''}
+const bInput=(p,val,ph,extra)=>`<input class="bi" data-p="${p}" value="${esc(val)}" placeholder="${esc(ph||'')}" ${extra||''}>`;
+const bArea=(p,val,ph)=>`<textarea class="bi" data-p="${p}" rows="2" placeholder="${esc(ph||'')}">${esc(val)}</textarea>`;
+const bLabel=x=>(x.name||'Untitled build')+(x.slots.slice(0,3).some(s=>s.n)?' – '+x.slots.slice(0,3).map(s=>s.n||'?').join('/'):'');
+function abSummary(b,i,j){const a=b.slots[i].ab[j];
+  const st=j===0?'<span class="from">with essence</span>':(a.stone?`<span class="marble ${stoneRc(a.stone)}" aria-hidden="true"></span><span>${esc(a.stone)}${a.ord?' ('+esc(a.ord)+')':''}</span>`:'<span class="from">no stone yet</span>');
+  return `<span class="abn">${a.name?'['+esc(a.name)+']':'<i class="from">Unnamed</i>'}</span>${st}<span class="stat ${a.locked?'lk':'aw'}">${a.locked?'Locked':'Awakened'}</span>`}
+function abHTML(b,i,j){const a=b.slots[i].ab[j];const P=`slots.${i}.ab.${j}`;
+  return `<details class="abil-d"><summary id="sum-${i}-${j}">${abSummary(b,i,j)}</summary><div class="abody">
+   <label class="fl">Ability name${bInput(P+'.name',a.name,'e.g. Surge of Vigor')}</label>
+   <label class="fl">Status<select class="bi" data-p="${P}.locked" data-bool="1"><option value="1" ${a.locked?'selected':''}>Locked (planned)</option><option value="" ${a.locked?'':'selected'}>Awakened</option></select></label>
+   ${j===0?'<p class="from">Awakened with the essence, so no stone.</p>':`<div class="row2"><label class="fl" style="flex:1 1 160px">Awakening stone${bInput(P+'.stone',a.stone,'e.g. Myriad','list="dl-stone"')}</label><label class="fl" style="flex:0 0 84px">Order #${bInput(P+'.ord',a.ord,'1–16','inputmode="numeric"')}</label></div>`}
+   <div class="row2"><label class="fl" style="flex:1 1 140px">Cost${bInput(P+'.cost',a.cost,'e.g. Moderate mana')}</label><label class="fl" style="flex:1 1 140px">Cooldown${bInput(P+'.cd',a.cd,'e.g. 30 seconds')}</label></div>
+   <label class="fl">Effect (Iron)${bArea(P+'.eff.I',a.eff.I,'What it does at iron rank')}</label>
+   <details class="more"><summary>More: type, incantation, higher ranks</summary>
+    <label class="fl">Type and tags${bInput(P+'.type',a.type,'e.g. Spell (drain, blood)')}</label>
+    <label class="fl">Incantation${bInput(P+'.inc',a.inc,'Optional')}</label>
+    ${EFF.slice(1).map(([k,l])=>`<label class="fl">Effect (${l})${bArea(P+'.eff.'+k,a.eff[k],'')}</label>`).join('')}
+   </details></div></details>`}
+function slotHTML(b,i){const s=b.slots[i];const isC=i===3;
+  return `<section class="bslot${isC?' conf':''}"><div class="bs-head"><span class="attr">${SLOTN[i]}</span><span class="cnt" id="cnt-${i}"></span></div>
+   <div class="row2"><label class="fl" style="flex:2 1 150px">${isC?'Confluence':'Essence'}${bInput(`slots.${i}.n`,s.n,isC?'Unknown Confluence':'e.g. Potent',`list="${isC?'dl-conf':'dl-ess'}"`)}</label>
+   <label class="fl" style="flex:1 1 110px">Attribute<select class="bi" data-p="slots.${i}.attr"><option value="">Choose…</option>${ATTRS.map(a=>`<option ${s.attr===a?'selected':''}>${a}</option>`).join('')}</select></label>
+   ${isC?'':`<label class="fl" style="flex:0 0 84px">Absorbed<select class="bi" data-p="slots.${i}.ord"><option value="">#</option>${[1,2,3].map(n=>`<option ${String(s.ord)===String(n)?'selected':''}>${n}</option>`).join('')}</select></label>`}</div>
+   ${isC?'<p class="sugg" id="confSugg"></p>':''}
+   <div class="abl">${s.ab.map((_,j)=>abHTML(b,i,j)).join('')}</div></section>`}
+function giftsHTML(b){return b.gifts.map((g,k)=>`<div class="gift"><div class="row2"><label class="fl" style="flex:1 1 200px">Gift${bInput(`gifts.${k}.name`,g.name,'e.g. Astral Affinity')}</label><button type="button" class="icon" data-delgift="${k}" aria-label="Remove this gift">×</button></div>${bArea(`gifts.${k}.desc`,g.desc,'What it does')}</div>`).join('')||'<p class="from">No racial gifts yet. Type a race above, then tap "Fill from race", or add them one by one.</p>'}
+function renderBuild(){
+  const b=CB();
+  $('bSel').innerHTML=BL.list.map((x,k)=>`<option value="${k}" ${k===BL.cur?'selected':''}>${esc(bLabel(x))}</option>`).join('');
+  $('bMain').innerHTML=`<div class="row2" style="margin-top:14px"><label class="fl" style="flex:2 1 180px">Character name${bInput('name',b.name,'Optional')}</label>
+    <label class="fl" style="flex:1 1 140px">Race${bInput('race',b.race,'e.g. Outworlder','list="dl-race"')}</label>
+    <label class="fl" style="flex:1 1 110px">Rank<select class="bi" data-p="rank">${RANKS.map(r=>`<option ${b.rank===r?'selected':''}>${r}</option>`).join('')}</select></label></div>
+    <p class="sugg" id="ordCheck" style="margin-top:8px"></p>
+    <div class="bslots">${[0,1,2,3].map(i=>slotHTML(b,i)).join('')}</div>
+    <section class="bsec"><div class="bs-head"><h3>Racial gifts</h3><span class="bbtns"><button type="button" class="btn sm" id="fillGifts">Fill from race</button><button type="button" class="btn sm" id="addGift">Add gift</button></span></div><div id="gifts">${giftsHTML(b)}</div></section>
+    <section class="bsec"><h3>Inventory and notes</h3>${bArea('inv',b.inv,'Items, equipment, ideas…')}</section>`;
+  $('dl-ess').innerHTML=Object.keys(ESS).sort().map(n=>`<option value="${esc(n)}"></option>`).join('');
+  $('dl-conf').innerHTML=CONFLUENCES.map(n=>`<option value="${esc(n)}"></option>`).join('');
+  $('dl-stone').innerHTML=Object.keys(STONES).sort().map(n=>`<option value="${esc(n)}"></option>`).join('');
+  $('dl-race').innerHTML=Object.keys(RACE_INFO).map(n=>`<option value="${esc(n)}"></option>`).join('');
+  $('saveNote').hidden=canSave;refreshCode();
+  bDerived();
+}
+function bDerived(){const b=CB();
+  [0,1,2,3].forEach(i=>{const c=$('cnt-'+i);if(c)c.textContent=b.slots[i].ab.filter(a=>!a.locked).length+'/5 awakened'});
+  const es=b.slots.slice(0,3).map(s=>findKey(ESS,s.n));const cs=$('confSugg');
+  const ci=document.querySelector('[data-p="slots.3.n"]');const k=es.every(Boolean)?confsFor(es):[];
+  if(k.length){const c=k[0].c;if(b.slots[3].n!==c){b.slots[3].n=c;b.slots[3].auto=true;saveB()}if(ci){ci.value=c;ci.disabled=true}}
+  else{if(b.slots[3].auto){b.slots[3].n='';b.slots[3].auto=false;saveB()}if(ci){ci.disabled=false;if(document.activeElement!==ci)ci.value=b.slots[3].n}}
+  if(cs)cs.textContent=k.length?'':(es.every(Boolean)&&!b.slots[3].n?'Unknown Confluence':'');
+  const nums=[];b.slots.forEach(s=>s.ab.forEach((a,j)=>{const v=String(a.ord).trim();if(j>0&&v)nums.push(v)}));
+  const dup=[...new Set(nums.filter((n,k)=>nums.indexOf(n)!==k))];
+  const eo=b.slots.slice(0,3).map(s=>s.ord).filter(Boolean);const edup=[...new Set(eo.filter((n,k)=>eo.indexOf(n)!==k))];
+  const parts=[`Stones numbered: ${nums.length} of 16.`];
+  if(dup.length)parts.push(`Order number${dup.length>1?'s':''} ${dup.join(', ')} ${dup.length>1?'are':'is'} used more than once.`);
+  if(edup.length)parts.push(`More than one essence is marked absorbed #${edup.join(', ')}.`);
+  $('ordCheck').textContent=parts.join(' ');
+}
+$('view-build').addEventListener('input',e=>{const el=e.target.closest('.bi');if(!el||!el.dataset.p)return;const b=CB();let v=el.value;if(el.dataset.bool)v=!!v;setP(b,el.dataset.p,v);b.t=Date.now();saveB();
+  const m=el.dataset.p.match(/^slots\.(\d)\.ab\.(\d)\./);if(m){const s=$(`sum-${m[1]}-${m[2]}`);if(s)s.innerHTML=abSummary(b,+m[1],+m[2])}
+  const o=$('bSel').options[BL.cur];if(o)o.textContent=bLabel(b);
+  bDerived()});
+$('view-build').addEventListener('change',e=>{if(e.target.matches('select.bi'))e.target.dispatchEvent(new Event('input',{bubbles:true}))});
+$('view-build').addEventListener('click',e=>{const b=CB();
+  if(e.target.closest('#addGift')){b.gifts.push({name:'',desc:''});saveB();$('gifts').innerHTML=giftsHTML(b);return}
+  const d=e.target.closest('[data-delgift]');if(d){b.gifts.splice(+d.dataset.delgift,1);saveB();$('gifts').innerHTML=giftsHTML(b);return}
+  if(e.target.closest('#fillGifts')){const r=RACE_INFO[findKey(RACE_INFO,b.race)];
+    if(!r){toast('Type a race from the list first, like Human, Elf or Outworlder.');return}
+    let n=0;r.a.forEach(([nm,ds])=>{if(!b.gifts.some(g=>g.name.toLowerCase()===nm.toLowerCase())){b.gifts.push({name:nm,desc:ds});n++}});
+    saveB();$('gifts').innerHTML=giftsHTML(b);toast(n?`Added ${n} standard gift${n>1?'s':''}. Edit them to match your character.`:'Those gifts are already listed.')}
+});
+$('bSel').addEventListener('change',()=>{BL.cur=+$('bSel').value;saveB();renderBuild()});
+$('bNew').addEventListener('click',()=>{BL.list.push(newBuild());BL.cur=BL.list.length-1;saveB();renderBuild();toast('Started a new blank build.')});
+$('bDup').addEventListener('click',()=>{const c=normBuild(clone(CB()));c.name=(c.name||'Untitled build')+' (copy)';BL.list.push(c);BL.cur=BL.list.length-1;saveB();renderBuild();toast('Copied. You are now editing the copy.')});
+let delArm=0;$('bDel').addEventListener('click',()=>{const btn=$('bDel');
+  if(Date.now()-delArm>4000){delArm=Date.now();btn.textContent='Tap again to delete';setTimeout(()=>{btn.textContent='Delete'},4000);return}
+  delArm=0;btn.textContent='Delete';BL.list.splice(BL.cur,1);if(!BL.list.length)BL.list.push(newBuild());BL.cur=Math.max(0,BL.cur-1);saveB();renderBuild();toast('Build deleted.')});
+function discordText(b){const L=[];
+  const head=[b.name?`**${b.name}**`:'',b.race,b.rank&&b.rank!=='Normal'?b.rank+' rank':''].filter(Boolean).join(' · ');if(head)L.push(head,'');
+  const order=[0,1,2,3].sort((x,y)=>{const ax=b.slots[x].attr?ATTRS.indexOf(b.slots[x].attr):9,ay=b.slots[y].attr?ATTRS.indexOf(b.slots[y].attr):9;return ax-ay||x-y});
+  const nm=i=>b.slots[i].n||(i===3?'Unknown Confluence':'?');
+  order.forEach(i=>{const s=b.slots[i];L.push(`${s.attr||'Attribute?'}: [${nm(i)}]${i<3&&s.ord?' ('+s.ord+')':''}`)});
+  order.forEach(i=>{const s=b.slots[i];L.push('',`${i===3?(s.n?s.n+' Confluence':'Unknown Confluence'):(s.n||SLOTN[i])+' Essence'} Abilities (${s.ab.filter(a=>!a.locked).length}/5)`);
+    s.ab.forEach((a,j)=>{L.push('',`Ability: [${a.name}]${a.locked?' (Locked)':''}`);
+      L.push(`- AS: ${j===0?'None (Awakened with Essence)':(a.stone||'')+(a.ord?' ('+a.ord+')':'')}`);
+      if(a.type)L.push(`- Type: ${a.type}`);if(a.inc)L.push(`- Incantation: "${a.inc}"`);
+      L.push(`- Cost: ${a.cost}`,`- Cooldown: ${a.cd}`);
+      EFF.forEach(([k,l])=>{if(k==='I'||a.eff[k])L.push(`- Effect (${l}): ${a.eff[k]}`)})})});
+  if(b.gifts.length){L.push('',`${b.race||'Racial'} Racial Gifts`);b.gifts.forEach(g=>L.push(`- ${g.name}: ${g.desc}`))}
+  if(b.inv.trim())L.push('','Inventory and notes',b.inv.trim());
+  return L.join('\n').replace(/[ \t]+\n/g,'\n');}
+function pruneB(v,k){if(Array.isArray(v))return v.map(x=>pruneB(x));if(v&&typeof v==='object'){const o={};for(const key in v){if(key==='t')continue;const p=pruneB(v[key],key);if(p===''||p===undefined)continue;if(key==='eff'&&!Object.keys(p).length)continue;o[key]=p}return o}return v}
+const jsonB=b=>JSON.stringify(pruneB(b));
+const b64u=bytes=>{let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const unb64=s=>{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u};
+const plainCode=json=>'HWFWM1:'+b64u(new TextEncoder().encode(json));
+const CC={json:'',code:''};
+function refreshCode(){const json=jsonB(CB());if(json===CC.json&&CC.code)return;CC.json=json;CC.code=plainCode(json);
+  if(typeof CompressionStream==='undefined')return;
+  new Response(new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer().then(buf=>{const z='HWFWM2:'+b64u(new Uint8Array(buf));if(CC.json===json&&z.length<CC.code.length)CC.code=z}).catch(()=>{})}
+function currentCode(){const json=jsonB(CB());return json===CC.json&&CC.code?CC.code:plainCode(json)}
+async function decB(text){const m=String(text).match(/HWFWM([12])\s*:\s*([A-Za-z0-9+\/=_\-\s]+)/);
+  let ver='1',body;if(m){ver=m[1];body=m[2]}else body=String(text);
+  body=body.replace(/\s+/g,'');if(!body)throw new Error('empty');
+  const bytes=unb64(body);let json;
+  if(ver==='2')json=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+  else json=new TextDecoder().decode(bytes);
+  return normBuild(JSON.parse(json))}
+function copyText(txt,msg,title){
+  const fb=()=>{showDlg(`<div class="kind">Copy</div><h2 id="dlgTitle">${esc(title)}</h2><p class="from">Automatic copying is blocked here. The text is selected; press Ctrl+C, or long-press and choose Copy.</p><textarea id="copyTa" readonly>${esc(txt)}</textarea>`);const ta=$('copyTa');ta.focus();ta.select()};
+  try{navigator.clipboard.writeText(txt).then(()=>toast(msg),fb)}catch(e){fb()}}
+$('bDiscord').addEventListener('click',()=>{const t=discordText(CB());copyText(t,t.length>2000?`Copied (${t.length} characters). Discord allows 2,000 per message, so you may need to paste it in parts.`:'Copied in the community format. Paste it into Discord.','Your build for Discord')});
+$('bCode').addEventListener('click',()=>{const c=currentCode();rememberCode(c,bLabel(CB()),'copied');copyText(c,c.length>2000?`Build code copied (${c.length} characters). It's over Discord's 2,000 limit, so save it in a notes app instead.`:'Build code copied. Paste it somewhere safe, or share it so others can load it.','Your build code')});
+$('bLoad').addEventListener('click',()=>{const p=$('loadPanel');p.hidden=!p.hidden;if(!p.hidden){$('loadTa').value='';renderRecent();$('loadTa').focus()}});
+$('loadCancel').addEventListener('click',()=>{$('loadPanel').hidden=true});
+const RCK=KEY+':codes';
+function rememberCode(code,label,how){let L=store.get(RCK,[]);if(!Array.isArray(L))L=[];L=L.filter(x=>x&&x.code!==code);L.unshift({code,label,how,t:Date.now()});store.set(RCK,L.slice(0,10));}
+function renderRecent(){let L=store.get(RCK,[]);if(!Array.isArray(L))L=[];const el=$('recentCodes');
+  el.innerHTML=L.length?`<div class="rcodes"><h4>Recent codes</h4>${L.map((x,k)=>`<button type="button" class="rcode" data-rc="${k}"><b>${esc(x.label||'Untitled build')}</b><span class="rk">${x.how==='copied'?'Copied':'Loaded'} ${new Date(x.t).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></button>`).join('')}</div>`:'';}
+/* ---------- download / open build files ---------- */
+const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0};
+function zipStore(files){const enc=new TextEncoder();const parts=[],central=[];let off=0;
+  const u16=v=>[v&255,(v>>8)&255],u32=v=>[v&255,(v>>8)&255,(v>>16)&255,(v>>>24)&255];
+  files.forEach(([name,str])=>{const nb=enc.encode(name),db=enc.encode(str),c=crc32(db);
+    const lh=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(db.length),...u32(db.length),...u16(nb.length),...u16(0)]);
+    parts.push(lh,nb,db);
+    central.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(db.length),...u32(db.length),...u16(nb.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nb);
+    off+=lh.length+nb.length+db.length});
+  const cs=central.reduce((a,b)=>a+b.length,0);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cs),...u32(off),...u16(0)]);
+  return new Blob([...parts,...central,end])}
+const xesc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
+function docLines(b){const code=currentCode();
+  const L=discordText(b).replace(/\*\*/g,'').split('\n').map(t=>({t,b:/^(Ability: |.* Abilities \(\d\/5\)$|.*Racial Gifts$|Inventory and notes$)/.test(t)}));
+  if(L.length)L[0].b=true;L.push({t:''},{t:'Build code (paste into Load build code on the HWFWM Essences site to reopen this build):',b:true},{t:code});return L}
+function makeDocx(b){const L=docLines(b);
+  const body=L.map(l=>`<w:p>${l.t?`<w:r>${l.b?'<w:rPr><w:b/></w:rPr>':''}<w:t xml:space="preserve">${xesc(l.t)}</w:t></w:r>`:''}</w:p>`).join('');
+  return zipStore([['[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
+    ['_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+    ['word/document.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1080" w:right="1080" w:bottom="1080" w:left="1080" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr></w:body></w:document>`]])}
+function makeOdt(b){const L=docLines(b);
+  const body=L.map(l=>`<text:p>${l.t?(l.b?`<text:span text:style-name="B">${xesc(l.t)}</text:span>`:xesc(l.t)):''}</text:p>`).join('');
+  return zipStore([['mimetype','application/vnd.oasis.opendocument.text'],
+    ['META-INF/manifest.xml','<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/><manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/></manifest:manifest>'],
+    ['content.xml',`<?xml version="1.0" encoding="UTF-8"?><office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.2"><office:automatic-styles><style:style style:name="B" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style></office:automatic-styles><office:body><office:text>${body}</office:text></office:body></office:document-content>`]])}
+function makeTxt(b){return new Blob([docLines(b).map(l=>l.t).join('\r\n')],{type:'text/plain'})}
+function fileBase(b){return ((b.name||'').trim()||'hwfwm-build').replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,'-').slice(0,60)||'hwfwm-build'}
+function downloadBuild(kind){const b=CB();refreshCode();
+  const blob=kind==='docx'?makeDocx(b):kind==='odt'?makeOdt(b):makeTxt(b);
+  const name=fileBase(b)+'.'+kind;
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.style.display='none';document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+    rememberCode(currentCode(),bLabel(b),'copied');
+    toast(`Downloading ${name}. If nothing appears in your downloads, this page isn't allowed to save files here.`)}
+  catch(e){toast('This page isn\'t allowed to save files here. Use Copy build code instead.')}}
+$('bDown').addEventListener('click',()=>{const p=$('downPanel');p.hidden=!p.hidden});
+$('downPanel').addEventListener('click',e=>{const k=e.target.closest('[data-dl]');if(k)downloadBuild(k.dataset.dl);if(e.target.closest('#downClose'))$('downPanel').hidden=true});
+async function unzipText(buf){const u=new Uint8Array(buf);const dv=new DataView(buf);const out={};let i=0;
+  while(i+30<=u.length&&dv.getUint32(i,true)===0x04034b50){const meth=dv.getUint16(i+8,true),flags=dv.getUint16(i+6,true);let csz=dv.getUint32(i+18,true);const nl=dv.getUint16(i+26,true),xl=dv.getUint16(i+28,true);
+    const name=new TextDecoder().decode(u.subarray(i+30,i+30+nl));const st=i+30+nl+xl;
+    if(flags&8&&csz===0){let j=st;while(j+4<=u.length&&dv.getUint32(j,true)!==0x08074b50&&dv.getUint32(j,true)!==0x04034b50&&dv.getUint32(j,true)!==0x02014b50)j++;csz=j-st}
+    const data=u.subarray(st,st+csz);
+    if(name==='word/document.xml'||name==='content.xml'){
+      if(meth===0)out[name]=new TextDecoder().decode(data);
+      else if(meth===8&&typeof DecompressionStream!=='undefined')out[name]=await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();}
+    i=st+csz;if(flags&8&&dv.getUint32(i,true)===0x08074b50)i+=16}
+  const x=out['word/document.xml']||out['content.xml'];if(x==null)throw new Error('nodoc');
+  return x.replace(/<\/(w:p|text:p|text:h)>/g,'\n').replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&')}
+$('loadFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;
+  try{const buf=await f.arrayBuffer();const head=new Uint8Array(buf.slice(0,2));const txt=head[0]===0x50&&head[1]===0x4B?await unzipText(buf):new TextDecoder().decode(buf);
+    if(!/HWFWM[12]\s*:/.test(txt)){toast('No build code found in that file. Only files downloaded from this site can be opened.');return}
+    $('loadTa').value=txt.match(/HWFWM[12]\s*:\s*[A-Za-z0-9+\/=_\-]+/)[0];$('loadGo').click()}
+  catch(err){toast('That file couldn\'t be read. Try a .docx, .odt or .txt downloaded from this site.')}});
+
+$('recentCodes').addEventListener('click',e=>{const b=e.target.closest('[data-rc]');if(!b)return;const L=store.get(RCK,[]);const x=L[+b.dataset.rc];if(!x)return;$('loadTa').value=x.code;toast('Code filled in. Tap Load build.')});
+
+$('loadGo').addEventListener('click',async()=>{const v=$('loadTa').value;
+  if(!v.trim()){toast('The box is empty. Long-press inside it and choose Paste.');return}
+  try{const nb=await decB(v);const mc=v.match(/HWFWM[12]\s*:\s*[A-Za-z0-9+\/=_\-\s]+/);rememberCode(mc?mc[0].replace(/\s+/g,''):v.trim(),bLabel(nb),'loaded');BL.list.push(nb);BL.cur=BL.list.length-1;saveB();$('loadPanel').hidden=true;$('loadTa').value='';renderBuild();toast('Build loaded.')}
+  catch(err){toast('That code didn\'t work. It may have been cut off. Copy the whole code again, starting with HWFWM.')}});
+function planFromRoll(){const nb=newBuild();B.slots.forEach((s,i)=>{nb.slots[i].n=s.n});const c=confsFor(names())[0];nb.slots[3].n=c?c.c:'';nb.slots[3].auto=!!c;
+  [0,1,2,3].forEach(i=>B.stones[i].forEach((st,k)=>{if(k<4)nb.slots[i].ab[k+1].stone=st}));
+  BL.list.push(nb);BL.cur=BL.list.length-1;saveB();setView('build',true);toast('Build created from your roll. Pick attributes and name the abilities.')}
+$('planBtn').addEventListener('click',planFromRoll);
+
+/* ---------- start ---------- */
+renderSettings();renderHist();
+if(!(HIST[0]&&restore(HIST[0])))rollAll();else render();
+setView((location.hash||'').slice(1)||'roll',false);
+})();
+</script>
+
+<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>
+</body>
+</html>
